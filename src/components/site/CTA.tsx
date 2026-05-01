@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Calendar, Mail, Linkedin } from "lucide-react";
+import { ArrowRight, Layers } from "lucide-react";
 import { HeptaMark } from "./SiteHeader";
 
 export const CTA = () => {
   return (
-    <section id="contato" className="relative py-24 lg:py-28 bg-background overflow-hidden">
+    <section id="proximos-passos" className="relative py-24 lg:py-28 bg-background overflow-hidden">
       <div className="container">
         <div className="relative border-2 border-foreground bg-primary text-primary-foreground p-10 lg:p-16 shadow-brutal-lg overflow-hidden">
           <div className="absolute inset-0 bg-grid-brutal opacity-10" />
@@ -15,23 +15,21 @@ export const CTA = () => {
                 V1 · Próximo passo
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[0.95]">
-                Vamos transformar a operação da Hepta?
+                A apresentação termina aqui. A construção começa agora.
               </h2>
               <p className="mt-6 text-base lg:text-lg font-medium opacity-90 max-w-xl leading-relaxed">
                 A V1 cobre a visão de alto nível: três núcleos, modelo multi-entidade e item estratégico unificado.
-                A próxima conversa é definir piloto, áreas envolvidas e roadmap.
+                O próximo passo é entrar no primeiro módulo: <strong>Projetos & Squads</strong>.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button variant="hero" size="xl" asChild>
-                  <a href="mailto:hyago.keller@hepta.com.br">
-                    <Calendar className="mr-1" /> Agendar conversa <ArrowRight className="ml-1" />
+                  <a href="#nucleo-projetos">
+                    <Layers className="mr-1" /> Ir para Projetos & Squads <ArrowRight className="ml-1" />
                   </a>
                 </Button>
                 <Button variant="outlineLight" size="xl" asChild>
-                  <a href="#visao">
-                    Revisitar a visão
-                  </a>
+                  <a href="#visao">Revisitar a visão</a>
                 </Button>
               </div>
             </div>
@@ -55,16 +53,6 @@ export const CTA = () => {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-5 pt-5 border-t border-background/20 space-y-2 text-xs font-mono">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5" />
-                    <span>hyago.keller@hepta.com.br</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Linkedin className="h-3.5 w-3.5" />
-                    <span>/in/hyagokeller</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -112,7 +100,6 @@ export const SiteFooter = () => {
               <li><a href="#estrutura" className="hover:text-accent">Estrutura organizacional</a></li>
               <li><a href="#modelo" className="hover:text-accent">Modelo de dados</a></li>
               <li><a href="#plataforma" className="hover:text-accent">Módulos transversais</a></li>
-              <li><a href="#contato" className="hover:text-accent">Contato</a></li>
             </ul>
           </div>
         </div>
