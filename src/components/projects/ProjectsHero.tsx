@@ -11,6 +11,9 @@ export const ProjectsHero = () => {
           <Button variant="outline" size="sm" asChild>
             <Link to="/"><ArrowLeft className="mr-1" /> Voltar à apresentação</Link>
           </Button>
+          <Button variant="primary" size="sm" asChild>
+            <Link to="/projetos-squads/login">Entrar no app do Núcleo 01</Link>
+          </Button>
           <div className="inline-flex items-center gap-2 border-2 border-foreground bg-card px-3 py-1.5 shadow-brutal-sm">
             <span className="h-2 w-2 bg-primary rounded-full" />
             <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
