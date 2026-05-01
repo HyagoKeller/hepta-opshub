@@ -47,7 +47,7 @@ export const SiteHeader = () => {
 
         <div className="flex items-center gap-2">
           <Button variant="primary" size="sm" asChild>
-            <a href="#contato">Solicitar demo</a>
+            <a href="#nucleo-projetos">Acessar Projetos & Squads</a>
           </Button>
         </div>
       </div>
