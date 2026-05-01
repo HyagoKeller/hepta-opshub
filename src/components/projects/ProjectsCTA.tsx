@@ -9,19 +9,19 @@ export const ProjectsCTA = () => (
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8">
             <div className="inline-block border-2 border-background bg-accent text-accent-foreground px-3 py-1 mb-4 text-[11px] font-bold uppercase tracking-widest">
-              Próximo passo
+              Pronto para experimentar
             </div>
             <h2 className="font-display text-4xl lg:text-5xl tracking-tight leading-[0.95]">
-              Capacidades, visões e dados <span className="text-accent">ligados em uma só base</span>.
+              Entre no <span className="text-accent">app do Núcleo 01</span> e navegue pela V1.
             </h2>
             <p className="mt-5 text-base font-medium opacity-80 max-w-2xl">
-              Esta V1 mapeia o módulo. A próxima iteração detalha telas, fluxos e o modelo de dados do "item estratégico"
-              aplicado a Projetos & Squads.
+              Dashboard, portfólio, squads, capacidade, dependências e administração — tudo navegável com dados de
+              homologação. Acesse com a conta <code className="font-mono text-accent">admin@hepta.com.br</code>.
             </p>
           </div>
           <div className="lg:col-span-4 flex flex-col gap-3">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/">Voltar à apresentação <ArrowRight className="ml-1" /></Link>
+              <Link to="/projetos-squads/login">Entrar no app <ArrowRight className="ml-1" /></Link>
             </Button>
             <Button variant="outlineLight" size="xl" asChild>
               <a href="#capacidades">Revisitar capacidades</a>
