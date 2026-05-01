@@ -8,6 +8,7 @@ import ProjectsSquads from "./pages/ProjectsSquads.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import { AuthProvider } from "./modules/nucleo1/AuthContext";
+import { DataProvider } from "./modules/nucleo1/DataStore";
 import { AppShell } from "./modules/nucleo1/AppShell";
 import { LoginPage } from "./modules/nucleo1/LoginPage";
 import { DashboardPage } from "./modules/nucleo1/pages/DashboardPage";
@@ -28,6 +29,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <DataProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/projetos-squads" element={<ProjectsSquads />} />
@@ -42,6 +44,7 @@ const App = () => (
             <Route path="/projetos-squads/app/admin" element={<AppShell><AdminPage /></AppShell>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </DataProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

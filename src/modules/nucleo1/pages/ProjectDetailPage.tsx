@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PageHeader, StatusBadge, PriorityChip, HealthDot, KPI, SectionTitle } from "../ui";
-import { helpers, labels, deliveries, dependencies, projects } from "../mockData";
-import { ArrowLeft, Calendar, Users, AlertTriangle, FileText, Activity, Target } from "lucide-react";
+import { labels, dependencies } from "../mockData";
+import { useData, resources, clientes, nucleos, squads } from "../DataStore";
+import { ArrowLeft, Calendar, Users, AlertTriangle, FileText, Activity, Target, Plus, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ProjectFormDialog, DeliveryFormDialog, RiskFormDialog, AllocationFormDialog } from "../Forms";
+import type { Delivery, Allocation, Project } from "../types";
+import type { Risk } from "../DataStore";
+import { toast } from "@/hooks/use-toast";
 
 const tabs = [
   { id: "geral", label: "Visão geral", icon: Target },
@@ -15,9 +20,25 @@ const tabs = [
   { id: "historico", label: "Histórico", icon: Activity },
 ] as const;
 
+const helpersLocal = {
+  getResource: (id: string) => resources.find((r) => r.id === id),
+  getCliente: (id: string) => clientes.find((c) => c.id === id),
+  getNucleo: (id: string) => nucleos.find((n) => n.id === id),
+  getSquad: (id: string) => squads.find((s) => s.id === id),
+};
+
 export const ProjectDetailPage = () => {
   const { id } = useParams();
+  const { projects, byProject, allocations, deleteDelivery, deleteRisk, deleteAllocation } = useData();
   const [tab, setTab] = useState<typeof tabs[number]["id"]>("geral");
+  const [editProjOpen, setEditProjOpen] = useState(false);
+  const [delivOpen, setDelivOpen] = useState(false);
+  const [delivEdit, setDelivEdit] = useState<Delivery | undefined>();
+  const [riskOpen, setRiskOpen] = useState(false);
+  const [riskEdit, setRiskEdit] = useState<Risk | undefined>();
+  const [allocOpen, setAllocOpen] = useState(false);
+  const [allocEdit, setAllocEdit] = useState<Allocation | undefined>();
+
   const project = projects.find((p) => p.id === id);
 
   if (!project) {
@@ -31,13 +52,14 @@ export const ProjectDetailPage = () => {
     );
   }
 
-  const equipe = helpers.resourcesByProject(project.id);
-  const entregas = helpers.deliveriesByProject(project.id);
-  const cliente = helpers.getCliente(project.clienteId);
-  const nucleo = helpers.getNucleo(project.nucleoId);
-  const gestor = helpers.getResource(project.gestorId);
-  const squad = project.squadId ? helpers.getSquad(project.squadId) : undefined;
+  const { entregas, riscos, alocacoes } = byProject(project.id);
+  const cliente = helpersLocal.getCliente(project.clienteId);
+  const nucleo = helpersLocal.getNucleo(project.nucleoId);
+  const gestor = helpersLocal.getResource(project.gestorId);
+  const squad = project.squadId ? helpersLocal.getSquad(project.squadId) : undefined;
   const projDeps = dependencies.filter((d) => d.fromId === project.id || d.toId === project.id);
+
+  const totalAlloc = (rid: string) => allocations.filter((a) => a.resourceId === rid).reduce((s, a) => s + a.percentual, 0);
 
   return (
     <>
@@ -50,6 +72,9 @@ export const ProjectDetailPage = () => {
             <Button variant="outline" size="sm" asChild>
               <Link to="/projetos-squads/app/portfolio"><ArrowLeft /> Portfólio</Link>
             </Button>
+            <Button variant="primary" size="sm" onClick={() => setEditProjOpen(true)}>
+              <Pencil /> Editar projeto
+            </Button>
             <div className="flex items-center gap-2">
               <HealthDot saude={project.saude} withLabel />
               <StatusBadge status={project.status} />
@@ -59,7 +84,6 @@ export const ProjectDetailPage = () => {
         }
       />
 
-      {/* Tabs */}
       <div className="border-b-2 border-foreground bg-background">
         <div className="px-6 lg:px-8 flex overflow-x-auto">
           {tabs.map((t) => (
@@ -84,7 +108,7 @@ export const ProjectDetailPage = () => {
                 <KPI label="Progresso" value={`${project.progresso}%`} accent="primary" />
                 <KPI label="Orçamento" value={`R$ ${(project.orcamento / 1000).toFixed(0)}k`} sub={`Consumido R$ ${(project.consumido / 1000).toFixed(0)}k`} accent="info" />
                 <KPI label="Risco" value={project.risco.toUpperCase()} accent={project.risco === "alto" ? "destructive" : "accent"} />
-                <KPI label="Equipe" value={equipe.length} sub={`${entregas.length} entregas`} accent="success" />
+                <KPI label="Equipe" value={alocacoes.length} sub={`${entregas.length} entregas`} accent="success" />
               </div>
 
               <div className="border-2 border-foreground bg-card p-5 shadow-brutal-sm">
@@ -97,18 +121,23 @@ export const ProjectDetailPage = () => {
                   {" "}{new Date(project.fim).toLocaleDateString("pt-BR")}.
                 </p>
                 <div className="mt-4 grid sm:grid-cols-3 gap-3 text-xs">
-                  <Field k="Sponsor" v={helpers.getResource(project.sponsorId ?? "")?.nome ?? "—"} />
+                  <Field k="Sponsor" v={helpersLocal.getResource(project.sponsorId ?? "")?.nome ?? "—"} />
                   <Field k="Gestor" v={gestor?.nome ?? "—"} />
                   <Field k="Squad" v={squad?.nome ?? "—"} />
                 </div>
               </div>
 
               <div className="border-2 border-foreground bg-card p-5 shadow-brutal-sm">
-                <SectionTitle hint="próximas">Entregas</SectionTitle>
+                <div className="flex items-center justify-between mb-3">
+                  <SectionTitle hint="próximas">Entregas</SectionTitle>
+                  <Button variant="primary" size="sm" onClick={() => { setDelivEdit(undefined); setDelivOpen(true); }}>
+                    <Plus /> Nova entrega
+                  </Button>
+                </div>
                 <div className="divide-y-2 divide-foreground">
                   {entregas.map((d) => (
                     <div key={d.id} className="grid grid-cols-12 gap-3 items-center py-2.5">
-                      <div className="col-span-6 font-bold text-sm">{d.nome}</div>
+                      <div className="col-span-5 font-bold text-sm">{d.nome}</div>
                       <div className="col-span-2"><span className="font-mono text-[10px] uppercase tracking-widest">{d.tipo}</span></div>
                       <div className="col-span-2"><span className={cn(
                         "font-mono text-[10px] uppercase tracking-widest px-1.5 py-0.5 border-2 border-foreground",
@@ -118,6 +147,10 @@ export const ProjectDetailPage = () => {
                         d.status === "planejada" && "bg-muted",
                       )}>{d.status.replace("_", " ")}</span></div>
                       <div className="col-span-2 text-right font-mono text-xs">{new Date(d.data).toLocaleDateString("pt-BR")}</div>
+                      <div className="col-span-1 flex gap-1 justify-end">
+                        <button onClick={() => { setDelivEdit(d); setDelivOpen(true); }} className="p-1 border border-foreground hover:bg-accent"><Pencil className="h-3 w-3" /></button>
+                        <button onClick={() => { deleteDelivery(d.id); toast({ title: "Entrega removida" }); }} className="p-1 border border-foreground hover:bg-destructive hover:text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
+                      </div>
                     </div>
                   ))}
                   {entregas.length === 0 && <p className="text-xs text-muted-foreground py-4">Sem entregas cadastradas.</p>}
@@ -125,7 +158,6 @@ export const ProjectDetailPage = () => {
               </div>
             </div>
 
-            {/* Painel lateral */}
             <aside className="space-y-5">
               <div className="border-2 border-foreground bg-secondary text-secondary-foreground p-5 shadow-brutal-sm">
                 <div className="font-mono text-[10px] uppercase tracking-widest opacity-70 mb-3">Linha do tempo</div>
@@ -133,8 +165,6 @@ export const ProjectDetailPage = () => {
                   <TimelineItem when="Hoje" what="Atualização de status semanal" />
                   <TimelineItem when="-2d" what={`Aprovação de marco "${entregas[0]?.nome ?? "—"}"`} />
                   <TimelineItem when="-5d" what="Replanejamento de cronograma" />
-                  <TimelineItem when="-1w" what="Novo integrante alocado ao squad" />
-                  <TimelineItem when="-2w" what="Risco mitigado: integração externa" />
                 </div>
               </div>
 
@@ -157,45 +187,69 @@ export const ProjectDetailPage = () => {
         )}
 
         {tab === "equipe" && (
-          <div className="border-2 border-foreground bg-card shadow-brutal-sm overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-[10px] font-mono uppercase tracking-widest bg-foreground text-background">
-                <tr>
-                  <th className="text-left p-3">Colaborador</th>
-                  <th className="text-left">Papel</th>
-                  <th className="text-left">Vínculo</th>
-                  <th className="text-right p-3">Alocação no projeto</th>
-                  <th className="text-right p-3">Total geral</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y-2 divide-foreground">
-                {equipe.map((m) => {
-                  const total = helpers.totalAlloc(m.id);
-                  return (
-                    <tr key={m.id}>
-                      <td className="p-3">
-                        <div className="flex items-center gap-3">
-                          <span className="h-8 w-8 border-2 border-foreground bg-accent flex items-center justify-center font-bold text-xs">{m.avatar}</span>
-                          <span className="font-bold">{m.nome}</span>
-                        </div>
-                      </td>
-                      <td className="text-xs">{m.papel}</td>
-                      <td><span className="font-mono text-[10px] uppercase tracking-widest">{m.kind}</span></td>
-                      <td className="text-right font-mono p-3">{m.percentual}%</td>
-                      <td className={cn("text-right font-mono p-3", total > 100 && "text-destructive font-bold")}>{total}%</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <Button variant="primary" size="sm" onClick={() => { setAllocEdit(undefined); setAllocOpen(true); }}>
+                <Plus /> Alocar colaborador
+              </Button>
+            </div>
+            <div className="border-2 border-foreground bg-card shadow-brutal-sm overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-[10px] font-mono uppercase tracking-widest bg-foreground text-background">
+                  <tr>
+                    <th className="text-left p-3">Colaborador</th>
+                    <th className="text-left">Papel</th>
+                    <th className="text-left">Vínculo</th>
+                    <th className="text-left">Período</th>
+                    <th className="text-right">Alocação</th>
+                    <th className="text-right">Total geral</th>
+                    <th className="text-right p-3">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y-2 divide-foreground">
+                  {alocacoes.map((a) => {
+                    const m = helpersLocal.getResource(a.resourceId);
+                    if (!m) return null;
+                    const total = totalAlloc(m.id);
+                    return (
+                      <tr key={a.id}>
+                        <td className="p-3">
+                          <div className="flex items-center gap-3">
+                            <span className="h-8 w-8 border-2 border-foreground bg-accent flex items-center justify-center font-bold text-xs">{m.avatar}</span>
+                            <span className="font-bold">{m.nome}</span>
+                          </div>
+                        </td>
+                        <td className="text-xs">{m.papel}</td>
+                        <td><span className="font-mono text-[10px] uppercase tracking-widest">{m.kind}</span></td>
+                        <td className="text-xs font-mono">{new Date(a.inicio).toLocaleDateString("pt-BR")} → {new Date(a.fim).toLocaleDateString("pt-BR")}</td>
+                        <td className="text-right font-mono">{a.percentual}%</td>
+                        <td className={cn("text-right font-mono", total > 100 && "text-destructive font-bold")}>{total}%</td>
+                        <td className="text-right p-3">
+                          <div className="inline-flex gap-1">
+                            <button onClick={() => { setAllocEdit(a); setAllocOpen(true); }} className="p-1 border border-foreground hover:bg-accent"><Pencil className="h-3 w-3" /></button>
+                            <button onClick={() => { deleteAllocation(a.id); toast({ title: "Alocação removida" }); }} className="p-1 border border-foreground hover:bg-destructive hover:text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {alocacoes.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">Nenhum colaborador alocado.</td></tr>}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
-        {tab === "cronograma" && <MiniGantt projectId={project.id} />}
-        {tab === "entregas" && <DeliveryBoard projectId={project.id} />}
-        {tab === "riscos" && <RiskList />}
+        {tab === "cronograma" && <MiniGantt entregas={entregas} />}
+        {tab === "entregas" && <DeliveryBoard entregas={entregas} onNew={() => { setDelivEdit(undefined); setDelivOpen(true); }} onEdit={(d) => { setDelivEdit(d); setDelivOpen(true); }} onDelete={(id) => { deleteDelivery(id); toast({ title: "Entrega removida" }); }} />}
+        {tab === "riscos" && <RiskList riscos={riscos} onNew={() => { setRiskEdit(undefined); setRiskOpen(true); }} onEdit={(r) => { setRiskEdit(r); setRiskOpen(true); }} onDelete={(id) => { deleteRisk(id); toast({ title: "Risco removido" }); }} />}
         {tab === "historico" && <AuditLog />}
       </div>
+
+      <ProjectFormDialog open={editProjOpen} onOpenChange={setEditProjOpen} initial={project} />
+      <DeliveryFormDialog open={delivOpen} onOpenChange={setDelivOpen} projectId={project.id} initial={delivEdit} />
+      <RiskFormDialog open={riskOpen} onOpenChange={setRiskOpen} projectId={project.id} initial={riskEdit} />
+      <AllocationFormDialog open={allocOpen} onOpenChange={setAllocOpen} projectId={project.id} initial={allocEdit} />
     </>
   );
 };
@@ -213,17 +267,16 @@ const TimelineItem = ({ when, what }: { when: string; what: string }) => (
   </div>
 );
 
-const MiniGantt = ({ projectId }: { projectId: string }) => {
-  const ds = helpers.deliveriesByProject(projectId);
-  if (ds.length === 0) return <p className="text-sm text-muted-foreground">Sem entregas.</p>;
-  const min = Math.min(...ds.map((d) => +new Date(d.data)));
-  const max = Math.max(...ds.map((d) => +new Date(d.data)));
+const MiniGantt = ({ entregas }: { entregas: Delivery[] }) => {
+  if (entregas.length === 0) return <p className="text-sm text-muted-foreground">Sem entregas cadastradas.</p>;
+  const min = Math.min(...entregas.map((d) => +new Date(d.data)));
+  const max = Math.max(...entregas.map((d) => +new Date(d.data)));
   const span = max - min || 1;
   return (
     <div className="border-2 border-foreground bg-card p-5 shadow-brutal-sm">
       <SectionTitle>Cronograma (Gantt leve)</SectionTitle>
       <div className="space-y-3">
-        {ds.map((d, i) => {
+        {entregas.map((d) => {
           const start = ((+new Date(d.data) - min) / span) * 80;
           return (
             <div key={d.id} className="grid grid-cols-12 gap-3 items-center">
@@ -243,43 +296,59 @@ const MiniGantt = ({ projectId }: { projectId: string }) => {
   );
 };
 
-const DeliveryBoard = ({ projectId }: { projectId: string }) => {
+const DeliveryBoard = ({ entregas, onNew, onEdit, onDelete }: {
+  entregas: Delivery[]; onNew: () => void; onEdit: (d: Delivery) => void; onDelete: (id: string) => void;
+}) => {
   const cols = ["planejada", "em_andamento", "concluida", "atrasada"] as const;
-  const ds = helpers.deliveriesByProject(projectId);
   return (
-    <div className="grid md:grid-cols-4 gap-4">
-      {cols.map((c) => (
-        <div key={c} className="border-2 border-foreground bg-card p-3 shadow-brutal-sm">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{c.replace("_", " ")}</div>
-          <div className="space-y-2">
-            {ds.filter((d) => d.status === c).map((d) => (
-              <div key={d.id} className="border-2 border-foreground p-2">
-                <div className="text-xs font-bold">{d.nome}</div>
-                <div className="text-[10px] font-mono text-muted-foreground mt-1">{new Date(d.data).toLocaleDateString("pt-BR")} · {d.tipo}</div>
-              </div>
-            ))}
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button variant="primary" size="sm" onClick={onNew}><Plus /> Nova entrega</Button>
+      </div>
+      <div className="grid md:grid-cols-4 gap-4">
+        {cols.map((c) => (
+          <div key={c} className="border-2 border-foreground bg-card p-3 shadow-brutal-sm">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{c.replace("_", " ")}</div>
+            <div className="space-y-2">
+              {entregas.filter((d) => d.status === c).map((d) => (
+                <div key={d.id} className="border-2 border-foreground p-2 group">
+                  <div className="text-xs font-bold">{d.nome}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground mt-1">{new Date(d.data).toLocaleDateString("pt-BR")} · {d.tipo}</div>
+                  <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100">
+                    <button onClick={() => onEdit(d)} className="p-1 border border-foreground hover:bg-accent text-[10px]"><Pencil className="h-3 w-3" /></button>
+                    <button onClick={() => onDelete(d.id)} className="p-1 border border-foreground hover:bg-destructive hover:text-destructive-foreground text-[10px]"><Trash2 className="h-3 w-3" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
 
-const RiskList = () => (
+const RiskList = ({ riscos, onNew, onEdit, onDelete }: {
+  riscos: Risk[]; onNew: () => void; onEdit: (r: Risk) => void; onDelete: (id: string) => void;
+}) => (
   <div className="border-2 border-foreground bg-card p-5 shadow-brutal-sm">
-    <SectionTitle>Riscos identificados</SectionTitle>
+    <div className="flex items-center justify-between mb-3">
+      <SectionTitle>Riscos identificados</SectionTitle>
+      <Button variant="primary" size="sm" onClick={onNew}><Plus /> Novo risco</Button>
+    </div>
+    {riscos.length === 0 && <p className="text-sm text-muted-foreground py-4">Nenhum risco cadastrado para este projeto.</p>}
     <ul className="divide-y-2 divide-foreground">
-      {[
-        { sev: "alto", t: "Atraso na integração externa", o: "Renegociar SLA com fornecedor", s: "aberto" },
-        { sev: "medio", t: "Rotatividade no squad", o: "Plano de retenção e backup", s: "mitigado" },
-        { sev: "baixo", t: "Mudança de escopo pelo cliente", o: "Comitê quinzenal", s: "monitorado" },
-      ].map((r, i) => (
-        <li key={i} className="py-3 grid grid-cols-12 gap-3 items-center">
-          <span className={cn("col-span-1 inline-block px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border-2 border-foreground",
-            r.sev === "alto" ? "bg-destructive text-destructive-foreground" : r.sev === "medio" ? "bg-accent" : "bg-muted")}>{r.sev}</span>
-          <span className="col-span-5 text-sm font-bold">{r.t}</span>
-          <span className="col-span-4 text-xs text-muted-foreground">{r.o}</span>
-          <span className="col-span-2 text-right font-mono text-[10px] uppercase tracking-widest">{r.s}</span>
+      {riscos.map((r) => (
+        <li key={r.id} className="py-3 grid grid-cols-12 gap-3 items-center">
+          <span className={cn("col-span-1 inline-block px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border-2 border-foreground text-center",
+            r.severidade === "alto" ? "bg-destructive text-destructive-foreground" : r.severidade === "medio" ? "bg-accent" : "bg-muted")}>{r.severidade}</span>
+          <span className="col-span-4 text-sm font-bold">{r.titulo}</span>
+          <span className="col-span-4 text-xs text-muted-foreground">{r.mitigacao || "—"}</span>
+          <span className="col-span-2 font-mono text-[10px] uppercase tracking-widest">{r.status}</span>
+          <span className="col-span-1 flex gap-1 justify-end">
+            <button onClick={() => onEdit(r)} className="p-1 border border-foreground hover:bg-accent"><Pencil className="h-3 w-3" /></button>
+            <button onClick={() => onDelete(r.id)} className="p-1 border border-foreground hover:bg-destructive hover:text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
+          </span>
         </li>
       ))}
     </ul>
@@ -294,7 +363,6 @@ const AuditLog = () => (
         { t: "01/05 14:22", u: "Hyago Keller", a: "alterou status para Em execução" },
         { t: "29/04 09:10", u: "Ana Martins", a: "adicionou Carla Souza ao squad" },
         { t: "27/04 17:48", u: "Hyago Keller", a: "aprovou marco Sandbox PIX" },
-        { t: "20/04 11:00", u: "Sistema", a: "registrou replanejamento (+15 dias)" },
       ].map((e, i) => (
         <li key={i} className="grid grid-cols-12 gap-3 border-l-2 border-foreground pl-3">
           <span className="col-span-2 text-muted-foreground">{e.t}</span>
