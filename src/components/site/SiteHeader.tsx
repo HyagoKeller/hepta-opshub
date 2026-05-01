@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { label: "Visão", href: "#visao" },
-  { label: "Projetos & Squads", href: "#nucleo-projetos" },
-  { label: "Licitações", href: "#nucleo-licitacoes" },
-  { label: "Automações", href: "#nucleo-automacoes" },
-  { label: "Plataforma", href: "#plataforma" },
+  { label: "Visão", href: "/#visao" },
+  { label: "Projetos & Squads", href: "/projetos-squads", route: true },
+  { label: "Licitações", href: "/#nucleo-licitacoes" },
+  { label: "Automações", href: "/#nucleo-automacoes" },
+  { label: "Plataforma", href: "/#plataforma" },
 ];
 
 const HeptaMark = () => (
@@ -47,7 +47,7 @@ export const SiteHeader = () => {
 
         <div className="flex items-center gap-2">
           <Button variant="primary" size="sm" asChild>
-            <a href="#nucleo-projetos">Acessar Projetos & Squads</a>
+            <Link to="/projetos-squads">Acessar Projetos & Squads</Link>
           </Button>
         </div>
       </div>
