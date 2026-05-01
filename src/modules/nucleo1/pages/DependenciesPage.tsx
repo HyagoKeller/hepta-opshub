@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { PageHeader, SectionTitle, KPI } from "../ui";
 import { dependencies, projects, deliveries, helpers } from "../mockData";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, ArrowRight, Network, GitBranch, Zap, Filter } from "lucide-react";
+import { AlertTriangle, ArrowRight, Network, GitBranch, Zap, Filter, Maximize2, Minimize2 } from "lucide-react";
 
 type NodeKind = "projeto" | "entrega";
 interface GraphNode {
@@ -59,6 +59,7 @@ const computeLayers = (nodes: GraphNode[], edges: typeof dependencies) => {
 export const DependenciesPage = () => {
   const [filter, setFilter] = useState<"todos" | "bloqueantes">("todos");
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [fullscreen, setFullscreen] = useState(false);
 
   const visibleEdges = useMemo(
     () => (filter === "bloqueantes" ? dependencies.filter((d) => d.bloqueante) : dependencies),
@@ -178,16 +179,29 @@ export const DependenciesPage = () => {
           <KPI label="Caminho crítico" value={`${criticalPath.length} etapas`} sub="cadeia mais longa de bloqueios" accent="info" />
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className={cn("grid gap-6", fullscreen ? "grid-cols-1" : "lg:grid-cols-3")}>
           {/* Grafo em camadas */}
-          <div className="lg:col-span-2 border-2 border-foreground bg-card shadow-brutal-sm">
-            <div className="px-5 pt-5">
+          <div className={cn(
+            "border-2 border-foreground bg-card shadow-brutal-sm",
+            fullscreen ? "fixed inset-4 z-50 col-span-full flex flex-col overflow-hidden" : "lg:col-span-2"
+          )}>
+            <div className="px-5 pt-5 flex items-start justify-between gap-4">
               <SectionTitle hint={`${nodes.length} nós · ${visibleEdges.length} relações · ${layers.length} camadas`}>
                 <Network className="inline h-4 w-4 mr-1" /> Grafo em camadas
               </SectionTitle>
+              <button
+                onClick={() => setFullscreen((v) => !v)}
+                className="px-2.5 py-1.5 border-2 border-foreground bg-background hover:bg-foreground hover:text-background font-mono text-[10px] uppercase tracking-widest flex items-center gap-1.5 shrink-0"
+                title={fullscreen ? "Reduzir" : "Expandir"}
+              >
+                {fullscreen ? <><Minimize2 className="h-3 w-3" /> Reduzir</> : <><Maximize2 className="h-3 w-3" /> Expandir</>}
+              </button>
             </div>
 
-            <div className="overflow-auto border-t-2 border-foreground bg-[linear-gradient(hsl(var(--muted))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--muted))_1px,transparent_1px)] bg-[size:24px_24px]">
+            <div className={cn(
+              "overflow-auto border-t-2 border-foreground bg-[linear-gradient(hsl(var(--muted))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--muted))_1px,transparent_1px)] bg-[size:24px_24px]",
+              fullscreen && "flex-1"
+            )}>
               <svg width={width} height={height} className="block min-w-full">
                 <defs>
                   <marker id="arr-default" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
