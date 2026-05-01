@@ -34,15 +34,25 @@ export const SiteHeader = () => {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item.route ? (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                key={item.href}
+                href={item.href}
+                className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
+              >
+                {item.label}
+              </a>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
