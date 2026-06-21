@@ -18,7 +18,7 @@ const MODALIDADES = [
   { id: 12, label: 'Credenciamento' },
 ];
 
-const UFS = ['', 'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const UFS = ['ALL','AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
 export const RadarPage = () => {
   const [items, setItems] = useState<PncpItem[]>([]);
@@ -28,7 +28,7 @@ export const RadarPage = () => {
 
   const [dias, setDias] = useState(7);
   const [palavra, setPalavra] = useState('');
-  const [uf, setUf] = useState('');
+  const [uf, setUf] = useState('ALL');
   const [filtroTI, setFiltroTI] = useState(true);
   const [modalidades, setModalidades] = useState<number[]>([6, 4, 8]);
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -40,7 +40,7 @@ export const RadarPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const d = await buscarLicitacoes({ diasAtras: dias, palavraChave: palavra || undefined, uf: uf || undefined, filtroTI, modalidades });
+      const d = await buscarLicitacoes({ diasAtras: dias, palavraChave: palavra || undefined, uf: uf && uf !== 'ALL' ? uf : undefined, filtroTI, modalidades });
       setItems(d.items);
       setMeta(d.meta);
       setLastUpdate(new Date());
@@ -144,7 +144,7 @@ export const RadarPage = () => {
               <Select value={uf} onValueChange={setUf}>
                 <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
-                  {UFS.map((u) => <SelectItem key={u || 'all'} value={u}>{u || 'Todas'}</SelectItem>)}
+                  {UFS.map((u) => <SelectItem key={u} value={u}>{u === 'ALL' ? 'Todas' : u}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
