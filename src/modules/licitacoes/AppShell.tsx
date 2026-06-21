@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Radar, FileSearch, Award, Boxes, Star, ChevronLeft, Menu } from 'lucide-react';
+import { Radar, FileSearch, Award, Boxes, Star, ChevronLeft, Menu, Building2, Crown } from 'lucide-react';
 import { HeptaMark } from '@/components/site/SiteHeader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 const nav = [
   { to: '/licitacoes', end: true, label: 'Radar PNCP', icon: Radar },
   { to: '/licitacoes/triagem', label: 'Triagem IA', icon: FileSearch },
+  { to: '/licitacoes/estrategicas', label: 'Itens Estratégicos', icon: Crown },
   { to: '/licitacoes/atestados', label: 'Atestados (CAT)', icon: Award },
   { to: '/licitacoes/solucoes', label: 'Soluções', icon: Boxes },
+  { to: '/licitacoes/perfil', label: 'Core Business', icon: Building2 },
   { to: '/licitacoes/favoritos', label: 'Favoritos', icon: Star },
 ];
 
