@@ -18,7 +18,7 @@ const MODALIDADES = [
   { id: 12, label: 'Credenciamento' },
 ];
 
-const UFS = ['', 'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const UFS = ['ALL','AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
 export const RadarPage = () => {
   const [items, setItems] = useState<PncpItem[]>([]);
