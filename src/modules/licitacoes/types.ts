@@ -16,7 +16,9 @@ export interface PncpItem {
   situacao?: string;
   linkSistemaOrigem?: string;
   amparoLegal?: string;
-  aderencia: { ti: boolean; portaria750: boolean; portaria1070: boolean };
+  aderencia: { ti: boolean; portaria750: boolean; portaria1070: boolean; lei14133?: boolean };
+  status?: 'candidate' | 'discarded';
+  motivos_descarte?: string[];
   raw?: any;
 }
 
@@ -48,10 +50,34 @@ export interface Solucao {
   criado_em?: string;
 }
 
+export interface CompanyProfile {
+  id?: string;
+  nome: string;
+  missao?: string;
+  especialidades: { area: string; nivel: string; descricao: string }[];
+  frameworks: string[];
+  tecnologias: string[];
+  certificacoes: string[];
+  diferenciais?: string;
+  blacklist_custom: string[];
+  valor_minimo: number;
+}
+
+export interface RequisitosExtraidos {
+  tecnologias_exigidas?: string[];
+  certificacoes_obrigatorias?: string[];
+  volume_estimado?: string;
+  perfis_profissionais?: string[];
+  prazo_execucao?: string;
+}
+
 export interface TriagemResultado {
   score_aderencia: number;
-  nivel: 'alta' | 'media' | 'baixa' | 'incompativel';
+  nivel: 'BID' | 'PARCIAL' | 'NO-BID' | 'alta' | 'media' | 'baixa' | 'incompativel';
+  categoria_explicacao?: string;
+  requisitos_extraidos?: RequisitosExtraidos;
   resumo: string;
+  resumo_executivo?: string[];
   pontos_fortes: string[];
   pontos_fracos: string[];
   atestados_match: { id: string; titulo: string; relevancia: number; justificativa: string }[];
@@ -65,4 +91,22 @@ export interface TriagemResultado {
     observacoes: string;
   };
   recomendacao: 'participar' | 'monitorar' | 'descartar';
+}
+
+export interface OportunidadeEstrategica {
+  id: string;
+  licitacao_id: string;
+  licitacao_titulo?: string;
+  orgao?: string;
+  uf?: string;
+  valor_estimado?: number;
+  score_aderencia?: number;
+  nivel?: string;
+  resumo_executivo?: string[];
+  recomendacao?: string;
+  responsavel?: string;
+  status: string;
+  triagem_payload?: TriagemResultado;
+  licitacao_payload?: PncpItem;
+  criado_em?: string;
 }

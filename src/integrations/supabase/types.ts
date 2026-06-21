@@ -59,6 +59,51 @@ export type Database = {
         }
         Relationships: []
       }
+      company_profile: {
+        Row: {
+          atualizado_em: string
+          blacklist_custom: string[]
+          certificacoes: string[]
+          criado_em: string
+          diferenciais: string | null
+          especialidades: Json
+          frameworks: string[]
+          id: string
+          missao: string | null
+          nome: string
+          tecnologias: string[]
+          valor_minimo: number
+        }
+        Insert: {
+          atualizado_em?: string
+          blacklist_custom?: string[]
+          certificacoes?: string[]
+          criado_em?: string
+          diferenciais?: string | null
+          especialidades?: Json
+          frameworks?: string[]
+          id?: string
+          missao?: string | null
+          nome?: string
+          tecnologias?: string[]
+          valor_minimo?: number
+        }
+        Update: {
+          atualizado_em?: string
+          blacklist_custom?: string[]
+          certificacoes?: string[]
+          criado_em?: string
+          diferenciais?: string | null
+          especialidades?: Json
+          frameworks?: string[]
+          id?: string
+          missao?: string | null
+          nome?: string
+          tecnologias?: string[]
+          valor_minimo?: number
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           criado_em: string
@@ -83,6 +128,63 @@ export type Database = {
           licitacao_payload?: Json
           notas?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      oportunidades_estrategicas: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          id: string
+          licitacao_id: string
+          licitacao_payload: Json | null
+          licitacao_titulo: string | null
+          nivel: string | null
+          orgao: string | null
+          recomendacao: string | null
+          responsavel: string | null
+          resumo_executivo: Json | null
+          score_aderencia: number | null
+          status: string
+          triagem_payload: Json | null
+          uf: string | null
+          valor_estimado: number | null
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          licitacao_id: string
+          licitacao_payload?: Json | null
+          licitacao_titulo?: string | null
+          nivel?: string | null
+          orgao?: string | null
+          recomendacao?: string | null
+          responsavel?: string | null
+          resumo_executivo?: Json | null
+          score_aderencia?: number | null
+          status?: string
+          triagem_payload?: Json | null
+          uf?: string | null
+          valor_estimado?: number | null
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          licitacao_id?: string
+          licitacao_payload?: Json | null
+          licitacao_titulo?: string | null
+          nivel?: string | null
+          orgao?: string | null
+          recomendacao?: string | null
+          responsavel?: string | null
+          resumo_executivo?: Json | null
+          score_aderencia?: number | null
+          status?: string
+          triagem_payload?: Json | null
+          uf?: string | null
+          valor_estimado?: number | null
         }
         Relationships: []
       }
@@ -138,7 +240,9 @@ export type Database = {
           pontos_fracos: Json | null
           recomendacao: string | null
           rentabilidade: Json | null
+          requisitos_extraidos: Json | null
           resumo: string | null
+          resumo_executivo: Json | null
           score_aderencia: number | null
           solucoes_match: Json | null
           valor_estimado: number | null
@@ -155,7 +259,9 @@ export type Database = {
           pontos_fracos?: Json | null
           recomendacao?: string | null
           rentabilidade?: Json | null
+          requisitos_extraidos?: Json | null
           resumo?: string | null
+          resumo_executivo?: Json | null
           score_aderencia?: number | null
           solucoes_match?: Json | null
           valor_estimado?: number | null
@@ -172,7 +278,9 @@ export type Database = {
           pontos_fracos?: Json | null
           recomendacao?: string | null
           rentabilidade?: Json | null
+          requisitos_extraidos?: Json | null
           resumo?: string | null
+          resumo_executivo?: Json | null
           score_aderencia?: number | null
           solucoes_match?: Json | null
           valor_estimado?: number | null
