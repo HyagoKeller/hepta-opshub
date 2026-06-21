@@ -20,6 +20,13 @@ import { DependenciesPage } from "./modules/nucleo1/pages/DependenciesPage";
 import { SchedulePage } from "./modules/nucleo1/pages/SchedulePage";
 import { AdminPage } from "./modules/nucleo1/pages/AdminPage";
 
+import { LicitacoesShell } from "./modules/licitacoes/AppShell";
+import { RadarPage } from "./modules/licitacoes/pages/RadarPage";
+import { TriagemPage } from "./modules/licitacoes/pages/TriagemPage";
+import { AtestadosPage } from "./modules/licitacoes/pages/AtestadosPage";
+import { SolucoesPage } from "./modules/licitacoes/pages/SolucoesPage";
+import { FavoritosPage } from "./modules/licitacoes/pages/FavoritosPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -42,6 +49,13 @@ const App = () => (
             <Route path="/projetos-squads/app/dependencias" element={<AppShell><DependenciesPage /></AppShell>} />
             <Route path="/projetos-squads/app/cronograma" element={<AppShell><SchedulePage /></AppShell>} />
             <Route path="/projetos-squads/app/admin" element={<AppShell><AdminPage /></AppShell>} />
+
+            <Route path="/licitacoes" element={<LicitacoesShell><RadarPage /></LicitacoesShell>} />
+            <Route path="/licitacoes/triagem" element={<LicitacoesShell><TriagemPage /></LicitacoesShell>} />
+            <Route path="/licitacoes/atestados" element={<LicitacoesShell><AtestadosPage /></LicitacoesShell>} />
+            <Route path="/licitacoes/solucoes" element={<LicitacoesShell><SolucoesPage /></LicitacoesShell>} />
+            <Route path="/licitacoes/favoritos" element={<LicitacoesShell><FavoritosPage /></LicitacoesShell>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
           </DataProvider>
