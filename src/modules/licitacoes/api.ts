@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Atestado, PncpItem, Solucao, TriagemResultado } from './types';
+import type { Atestado, CompanyProfile, OportunidadeEstrategica, PncpItem, Solucao, TriagemResultado } from './types';
 
 export async function buscarLicitacoes(params: {
   diasAtras?: number;
@@ -7,19 +7,39 @@ export async function buscarLicitacoes(params: {
   palavraChave?: string;
   uf?: string;
   filtroTI?: boolean;
+  valorMinimo?: number;
+  blacklistExtra?: string[];
+  incluirDescartados?: boolean;
 }) {
   const { data, error } = await supabase.functions.invoke('pncp-search', { body: params });
   if (error) throw error;
   return data as { items: PncpItem[]; meta: any };
 }
 
+export async function getCompanyProfile(): Promise<CompanyProfile | null> {
+  const { data } = await supabase.from('company_profile').select('*').limit(1).maybeSingle();
+  return (data as any) ?? null;
+}
+
+export async function upsertCompanyProfile(p: Partial<CompanyProfile> & { id?: string }) {
+  const payload = { ...p, atualizado_em: new Date().toISOString() } as any;
+  if (p.id) {
+    const { error } = await supabase.from('company_profile').update(payload).eq('id', p.id);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from('company_profile').insert(payload);
+    if (error) throw error;
+  }
+}
+
 export async function triagemIA(licitacao: PncpItem) {
-  const [{ data: atestados }, { data: solucoes }] = await Promise.all([
+  const [{ data: atestados }, { data: solucoes }, companyProfile] = await Promise.all([
     supabase.from('atestados').select('*'),
     supabase.from('solucoes').select('*'),
+    getCompanyProfile(),
   ]);
   const { data, error } = await supabase.functions.invoke('ai-triagem', {
-    body: { licitacao, atestados: atestados ?? [], solucoes: solucoes ?? [] },
+    body: { licitacao, atestados: atestados ?? [], solucoes: solucoes ?? [], companyProfile },
   });
   if (error) throw error;
   if ((data as any)?.error) throw new Error((data as any).error);
@@ -35,6 +55,8 @@ export async function salvarTriagem(licitacao: PncpItem, t: TriagemResultado) {
     score_aderencia: t.score_aderencia,
     nivel: t.nivel,
     resumo: t.resumo,
+    resumo_executivo: t.resumo_executivo ?? [],
+    requisitos_extraidos: t.requisitos_extraidos ?? {},
     pontos_fortes: t.pontos_fortes,
     pontos_fracos: t.pontos_fracos,
     atestados_match: t.atestados_match,
@@ -42,6 +64,36 @@ export async function salvarTriagem(licitacao: PncpItem, t: TriagemResultado) {
     rentabilidade: t.rentabilidade,
     recomendacao: t.recomendacao,
   });
+}
+
+// REQ-10 — Gatilho para Núcleo de Transformação
+export async function aprovarComoEstrategico(licitacao: PncpItem, t: TriagemResultado, responsavel?: string) {
+  const { error } = await supabase.from('oportunidades_estrategicas').insert({
+    licitacao_id: licitacao.id,
+    licitacao_titulo: licitacao.objeto?.slice(0, 240),
+    orgao: licitacao.orgao,
+    uf: licitacao.uf,
+    valor_estimado: licitacao.valorEstimado,
+    score_aderencia: t.score_aderencia,
+    nivel: t.nivel,
+    resumo_executivo: t.resumo_executivo ?? [],
+    recomendacao: t.recomendacao,
+    responsavel,
+    status: 'em_proposta',
+    triagem_payload: t as any,
+    licitacao_payload: licitacao as any,
+  });
+  if (error) throw error;
+}
+
+export async function listarEstrategicas(): Promise<OportunidadeEstrategica[]> {
+  const { data } = await supabase.from('oportunidades_estrategicas').select('*').order('criado_em', { ascending: false });
+  return (data ?? []) as any;
+}
+
+export async function atualizarStatusEstrategica(id: string, status: string, responsavel?: string) {
+  const { error } = await supabase.from('oportunidades_estrategicas').update({ status, responsavel, atualizado_em: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
 }
 
 export async function listarAtestados() {
