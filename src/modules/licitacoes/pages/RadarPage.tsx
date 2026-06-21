@@ -28,7 +28,7 @@ export const RadarPage = () => {
 
   const [dias, setDias] = useState(7);
   const [palavra, setPalavra] = useState('');
-  const [uf, setUf] = useState('');
+  const [uf, setUf] = useState('ALL');
   const [filtroTI, setFiltroTI] = useState(true);
   const [modalidades, setModalidades] = useState<number[]>([6, 4, 8]);
   const [autoRefresh, setAutoRefresh] = useState(true);
