@@ -40,7 +40,7 @@ export const RadarPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const d = await buscarLicitacoes({ diasAtras: dias, palavraChave: palavra || undefined, uf: uf || undefined, filtroTI, modalidades });
+      const d = await buscarLicitacoes({ diasAtras: dias, palavraChave: palavra || undefined, uf: uf && uf !== 'ALL' ? uf : undefined, filtroTI, modalidades });
       setItems(d.items);
       setMeta(d.meta);
       setLastUpdate(new Date());
