@@ -14,7 +14,171 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      atestados: {
+        Row: {
+          arquivo_url: string | null
+          cliente: string
+          criado_em: string
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          id: string
+          tags: string[] | null
+          tipo_servico: string
+          titulo: string
+          valor_contrato: number | null
+          vigente: boolean
+        }
+        Insert: {
+          arquivo_url?: string | null
+          cliente: string
+          criado_em?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          id?: string
+          tags?: string[] | null
+          tipo_servico: string
+          titulo: string
+          valor_contrato?: number | null
+          vigente?: boolean
+        }
+        Update: {
+          arquivo_url?: string | null
+          cliente?: string
+          criado_em?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          id?: string
+          tags?: string[] | null
+          tipo_servico?: string
+          titulo?: string
+          valor_contrato?: number | null
+          vigente?: boolean
+        }
+        Relationships: []
+      }
+      favoritos: {
+        Row: {
+          criado_em: string
+          id: string
+          licitacao_id: string
+          licitacao_payload: Json
+          notas: string | null
+          status: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          licitacao_id: string
+          licitacao_payload: Json
+          notas?: string | null
+          status?: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          licitacao_id?: string
+          licitacao_payload?: Json
+          notas?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      solucoes: {
+        Row: {
+          categoria: string
+          certificacoes: string[] | null
+          criado_em: string
+          descricao: string | null
+          diferenciais: string | null
+          fabricante: string | null
+          id: string
+          margem_estimada: number | null
+          nome: string
+          tags: string[] | null
+        }
+        Insert: {
+          categoria: string
+          certificacoes?: string[] | null
+          criado_em?: string
+          descricao?: string | null
+          diferenciais?: string | null
+          fabricante?: string | null
+          id?: string
+          margem_estimada?: number | null
+          nome: string
+          tags?: string[] | null
+        }
+        Update: {
+          categoria?: string
+          certificacoes?: string[] | null
+          criado_em?: string
+          descricao?: string | null
+          diferenciais?: string | null
+          fabricante?: string | null
+          id?: string
+          margem_estimada?: number | null
+          nome?: string
+          tags?: string[] | null
+        }
+        Relationships: []
+      }
+      triagens: {
+        Row: {
+          atestados_match: Json | null
+          criado_em: string
+          id: string
+          licitacao_id: string
+          licitacao_titulo: string | null
+          nivel: string | null
+          orgao: string | null
+          pontos_fortes: Json | null
+          pontos_fracos: Json | null
+          recomendacao: string | null
+          rentabilidade: Json | null
+          resumo: string | null
+          score_aderencia: number | null
+          solucoes_match: Json | null
+          valor_estimado: number | null
+        }
+        Insert: {
+          atestados_match?: Json | null
+          criado_em?: string
+          id?: string
+          licitacao_id: string
+          licitacao_titulo?: string | null
+          nivel?: string | null
+          orgao?: string | null
+          pontos_fortes?: Json | null
+          pontos_fracos?: Json | null
+          recomendacao?: string | null
+          rentabilidade?: Json | null
+          resumo?: string | null
+          score_aderencia?: number | null
+          solucoes_match?: Json | null
+          valor_estimado?: number | null
+        }
+        Update: {
+          atestados_match?: Json | null
+          criado_em?: string
+          id?: string
+          licitacao_id?: string
+          licitacao_titulo?: string | null
+          nivel?: string | null
+          orgao?: string | null
+          pontos_fortes?: Json | null
+          pontos_fracos?: Json | null
+          recomendacao?: string | null
+          rentabilidade?: Json | null
+          resumo?: string | null
+          score_aderencia?: number | null
+          solucoes_match?: Json | null
+          valor_estimado?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
