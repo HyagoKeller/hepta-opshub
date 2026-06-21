@@ -1,4 +1,5 @@
-import { LayoutDashboard, GitBranch, Trophy } from "lucide-react";
+import { LayoutDashboard, GitBranch, Trophy, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Core = {
   id: string;
@@ -12,6 +13,8 @@ type Core = {
   fields?: { k: string; v: string }[];
   badgeColor: "primary" | "accent" | "secondary";
   anchor: string;
+  route?: string;
+  routeLabel?: string;
 };
 
 const cores: Core[] = [
@@ -41,6 +44,8 @@ const cores: Core[] = [
     id: "02",
     number: "02",
     anchor: "nucleo-licitacoes",
+    route: "/licitacoes",
+    routeLabel: "Abrir Radar de Licitações",
     icon: Trophy,
     title: "Gestão de Licitações",
     subtitle: "Da prospecção à decisão bid/no-bid",
@@ -130,9 +135,19 @@ export const Cores = () => {
                     {core.desc}
                   </p>
 
+                  {core.route && (
+                    <Link
+                      to={core.route}
+                      className="mt-6 inline-flex items-center gap-2 border-2 border-foreground bg-foreground text-background px-4 py-2.5 text-xs font-bold uppercase tracking-widest shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+                    >
+                      {core.routeLabel ?? "Abrir módulo"} <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  )}
+
                   {core.views && (
                     <div className="mt-8">
                       <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+
                         Visualizações
                       </div>
                       <div className="flex flex-wrap gap-2">
