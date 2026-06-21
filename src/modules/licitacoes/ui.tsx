@@ -42,15 +42,24 @@ export const KPI = ({
 };
 
 export const NivelBadge = ({ n }: { n?: string }) => {
+  const k = (n ?? '').toLowerCase();
   const map: Record<string, string> = {
-    alta: 'bg-success text-success-foreground',
-    media: 'bg-warning text-warning-foreground',
-    baixa: 'bg-muted text-muted-foreground',
-    incompativel: 'bg-destructive text-destructive-foreground',
+    'bid': 'bg-success text-success-foreground',
+    'alta': 'bg-success text-success-foreground',
+    'parcial': 'bg-warning text-warning-foreground',
+    'media': 'bg-warning text-warning-foreground',
+    'no-bid': 'bg-destructive text-destructive-foreground',
+    'incompativel': 'bg-destructive text-destructive-foreground',
+    'baixa': 'bg-muted text-muted-foreground',
+  };
+  const dot: Record<string, string> = {
+    'bid': '🟢', 'alta': '🟢',
+    'parcial': '🟡', 'media': '🟡',
+    'no-bid': '🔴', 'incompativel': '🔴',
   };
   return (
-    <span className={cn('inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest border-2 border-foreground', map[n ?? ''] ?? 'bg-muted')}>
-      {n ?? '—'}
+    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest border-2 border-foreground', map[k] ?? 'bg-muted')}>
+      <span>{dot[k] ?? ''}</span>{n ?? '—'}
     </span>
   );
 };
