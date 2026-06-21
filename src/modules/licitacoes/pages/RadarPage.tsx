@@ -144,7 +144,7 @@ export const RadarPage = () => {
               <Select value={uf} onValueChange={setUf}>
                 <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
-                  {UFS.map((u) => <SelectItem key={u || 'all'} value={u}>{u || 'Todas'}</SelectItem>)}
+                  {UFS.map((u) => <SelectItem key={u} value={u}>{u === 'ALL' ? 'Todas' : u}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
