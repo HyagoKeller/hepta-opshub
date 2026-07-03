@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate, Link } from "react-router-dom";
-import { useAuth, SEED_CREDENTIALS } from "./AuthContext";
+import { useAuth, SEED_CREDENTIALS, SEED_USERS_INFO } from "./AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -144,12 +144,27 @@ export const LoginPage = () => {
                 {showHint ? "Ocultar" : "Mostrar"} credenciais de homologação
               </button>
               {showHint && (
-                <div className="border-2 border-dashed border-foreground bg-accent/30 p-3 text-xs">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Conta de teste</div>
-                  <div><strong>E-mail:</strong> {SEED_CREDENTIALS.email}</div>
-                  <div><strong>Senha:</strong> {SEED_CREDENTIALS.password}</div>
-                  <div className="mt-2 text-[10px] text-muted-foreground">
-                    Política: troca obrigatória no primeiro acesso (homologação).
+                <div className="border-2 border-dashed border-foreground bg-accent/30 p-3 text-xs space-y-2">
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Senha (todas as contas mock)</div>
+                    <div className="font-mono"><strong>{SEED_CREDENTIALS.password}</strong></div>
+                  </div>
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Usuários seed</div>
+                    <ul className="space-y-1">
+                      {SEED_USERS_INFO.map((u) => (
+                        <li key={u.email} className="flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { setEmail(u.email); setPassword(SEED_CREDENTIALS.password); }}
+                            className="text-left hover:underline"
+                          >
+                            <strong>{u.nome}</strong> · <span className="font-mono text-[10px]">{u.email}</span>
+                          </button>
+                          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{u.perfil}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               )}
