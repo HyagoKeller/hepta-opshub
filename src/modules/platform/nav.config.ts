@@ -32,6 +32,7 @@ export const NUCLEOS: NucleoDef[] = [
       { to: "/app/projetos/dependencias", label: "Dependências", icon: Network },
       { to: "/app/projetos/cronograma", label: "Cronograma", icon: GanttChartSquare },
       { to: "/app/projetos/admin", label: "Administração", icon: Settings },
+      { to: "/app/admin/acessos", label: "Acessos & Módulos", icon: ShieldCheck },
     ],
   },
   {
