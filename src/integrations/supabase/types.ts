@@ -188,6 +188,54 @@ export type Database = {
         }
         Relationships: []
       }
+      perfis: {
+        Row: {
+          ativo: boolean
+          atualizado_em: string
+          cargo: string
+          certificacoes: string[]
+          criado_em: string
+          custo_hora: number | null
+          disponibilidade_pct: number
+          frameworks: string[]
+          id: string
+          nome: string
+          observacoes: string | null
+          senioridade: string
+          skills: string[]
+        }
+        Insert: {
+          ativo?: boolean
+          atualizado_em?: string
+          cargo: string
+          certificacoes?: string[]
+          criado_em?: string
+          custo_hora?: number | null
+          disponibilidade_pct?: number
+          frameworks?: string[]
+          id?: string
+          nome: string
+          observacoes?: string | null
+          senioridade?: string
+          skills?: string[]
+        }
+        Update: {
+          ativo?: boolean
+          atualizado_em?: string
+          cargo?: string
+          certificacoes?: string[]
+          criado_em?: string
+          custo_hora?: number | null
+          disponibilidade_pct?: number
+          frameworks?: string[]
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          senioridade?: string
+          skills?: string[]
+        }
+        Relationships: []
+      }
       solucoes: {
         Row: {
           categoria: string
