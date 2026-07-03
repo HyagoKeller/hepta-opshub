@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Atestado, CompanyProfile, OportunidadeEstrategica, PncpItem, Solucao, TriagemResultado } from './types';
+import type { Atestado, CompanyProfile, OportunidadeEstrategica, Perfil, PncpItem, Solucao, TriagemResultado } from './types';
 
 export async function buscarLicitacoes(params: {
   diasAtras?: number;
@@ -33,17 +33,38 @@ export async function upsertCompanyProfile(p: Partial<CompanyProfile> & { id?: s
 }
 
 export async function triagemIA(licitacao: PncpItem) {
-  const [{ data: atestados }, { data: solucoes }, companyProfile] = await Promise.all([
+  const [{ data: atestados }, { data: solucoes }, { data: perfis }, companyProfile] = await Promise.all([
     supabase.from('atestados').select('*'),
     supabase.from('solucoes').select('*'),
+    supabase.from('perfis').select('*').eq('ativo', true),
     getCompanyProfile(),
   ]);
   const { data, error } = await supabase.functions.invoke('ai-triagem', {
-    body: { licitacao, atestados: atestados ?? [], solucoes: solucoes ?? [], companyProfile },
+    body: { licitacao, atestados: atestados ?? [], solucoes: solucoes ?? [], perfis: perfis ?? [], companyProfile },
   });
   if (error) throw error;
   if ((data as any)?.error) throw new Error((data as any).error);
   return (data as any).triagem as TriagemResultado;
+}
+
+export async function listarPerfis(): Promise<Perfil[]> {
+  const { data, error } = await supabase.from('perfis').select('*').order('nome');
+  if (error) throw error;
+  return (data ?? []) as Perfil[];
+}
+export async function upsertPerfil(p: Partial<Perfil> & { id?: string }) {
+  const payload = { ...p, atualizado_em: new Date().toISOString() } as any;
+  if (p.id) {
+    const { error } = await supabase.from('perfis').update(payload).eq('id', p.id);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from('perfis').insert(payload);
+    if (error) throw error;
+  }
+}
+export async function deletePerfil(id: string) {
+  const { error } = await supabase.from('perfis').delete().eq('id', id);
+  if (error) throw error;
 }
 
 export async function salvarTriagem(licitacao: PncpItem, t: TriagemResultado) {

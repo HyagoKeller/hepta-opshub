@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Radar, FileSearch, Award, Boxes, Star, ChevronLeft, Menu, Building2, Crown } from 'lucide-react';
+import { Radar, FileSearch, Award, Boxes, Star, ChevronLeft, Menu, Building2, Crown, Users } from 'lucide-react';
 import { HeptaMark } from '@/components/site/SiteHeader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ const nav = [
   { to: '/licitacoes/estrategicas', label: 'Itens Estratégicos', icon: Crown },
   { to: '/licitacoes/atestados', label: 'Atestados (CAT)', icon: Award },
   { to: '/licitacoes/solucoes', label: 'Soluções', icon: Boxes },
+  { to: '/licitacoes/perfis', label: 'Quadro de Perfis', icon: Users },
   { to: '/licitacoes/perfil', label: 'Core Business', icon: Building2 },
   { to: '/licitacoes/favoritos', label: 'Favoritos', icon: Star },
 ];

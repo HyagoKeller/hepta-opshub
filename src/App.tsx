@@ -27,6 +27,7 @@ import { AtestadosPage } from "./modules/licitacoes/pages/AtestadosPage";
 import { SolucoesPage } from "./modules/licitacoes/pages/SolucoesPage";
 import { FavoritosPage } from "./modules/licitacoes/pages/FavoritosPage";
 import { PerfilPage } from "./modules/licitacoes/pages/PerfilPage";
+import { PerfisPage } from "./modules/licitacoes/pages/PerfisPage";
 import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/licitacoes/favoritos" element={<LicitacoesShell><FavoritosPage /></LicitacoesShell>} />
             <Route path="/licitacoes/estrategicas" element={<LicitacoesShell><EstrategicasPage /></LicitacoesShell>} />
             <Route path="/licitacoes/perfil" element={<LicitacoesShell><PerfilPage /></LicitacoesShell>} />
+            <Route path="/licitacoes/perfis" element={<LicitacoesShell><PerfisPage /></LicitacoesShell>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
