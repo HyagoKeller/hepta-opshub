@@ -50,6 +50,21 @@ export interface Solucao {
   criado_em?: string;
 }
 
+export interface Perfil {
+  id: string;
+  nome: string;
+  cargo: string;
+  senioridade: 'junior' | 'pleno' | 'senior' | 'especialista' | string;
+  skills: string[];
+  certificacoes: string[];
+  frameworks: string[];
+  custo_hora?: number | null;
+  disponibilidade_pct: number;
+  ativo: boolean;
+  observacoes?: string;
+  criado_em?: string;
+}
+
 export interface CompanyProfile {
   id?: string;
   nome: string;
@@ -63,12 +78,40 @@ export interface CompanyProfile {
   valor_minimo: number;
 }
 
+export interface PerfilExigido {
+  papel: string;
+  senioridade?: string;
+  quantidade?: number;
+  skills_chave?: string[];
+  certificacoes?: string[];
+}
+
 export interface RequisitosExtraidos {
   tecnologias_exigidas?: string[];
   certificacoes_obrigatorias?: string[];
   volume_estimado?: string;
-  perfis_profissionais?: string[];
+  perfis_profissionais?: (string | PerfilExigido)[];
   prazo_execucao?: string;
+}
+
+export interface ExecutionMatch {
+  score_execucao: number;
+  cobertura_skills_pct: number;
+  cobertura_certificacoes_pct: number;
+  cobertura_headcount_pct: number;
+  gap_skills: string[];
+  gap_certificacoes: string[];
+  gap_headcount?: string;
+  alocacao_sugerida: {
+    perfil_id?: string;
+    nome: string;
+    papel_no_projeto: string;
+    alocacao_pct: number;
+    custo_hora?: number | null;
+    justificativa: string;
+  }[];
+  risco_execucao: 'baixo' | 'medio' | 'alto';
+  observacoes: string;
 }
 
 export interface TriagemResultado {
@@ -82,6 +125,7 @@ export interface TriagemResultado {
   pontos_fracos: string[];
   atestados_match: { id: string; titulo: string; relevancia: number; justificativa: string }[];
   solucoes_match: { id: string; nome: string; relevancia: number; justificativa: string }[];
+  execution_match?: ExecutionMatch;
   rentabilidade: {
     margem_estimada_pct: number;
     valor_estimado_brl: number | null;
