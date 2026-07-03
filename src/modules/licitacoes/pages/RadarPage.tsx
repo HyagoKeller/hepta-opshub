@@ -386,5 +386,82 @@ export const TriagemResultView = ({ r }: { r: TriagemResultado }) => (
         )) : <div className="text-xs text-muted-foreground">Nenhuma solução aplicável identificada.</div>}
       </div>
     </div>
+
+    {r.execution_match && (
+      <div className="border-2 border-foreground bg-card p-4 space-y-3">
+        <div className="flex items-baseline justify-between">
+          <div className="font-display text-sm">Match de Execução (Quadro de Perfis)</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Risco: <b className={r.execution_match.risco_execucao === 'alto' ? 'text-destructive' : r.execution_match.risco_execucao === 'medio' ? 'text-warning' : 'text-success'}>{r.execution_match.risco_execucao}</b>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div>
+            <div className="font-mono uppercase text-muted-foreground text-[10px]">Score execução</div>
+            <div className="font-display text-2xl">{r.execution_match.score_execucao}%</div>
+          </div>
+          <div>
+            <div className="font-mono uppercase text-muted-foreground text-[10px]">Skills</div>
+            <div className="font-display text-lg">{r.execution_match.cobertura_skills_pct}%</div>
+            <div className="h-1.5 bg-muted mt-1"><div className="h-full bg-accent" style={{ width: `${r.execution_match.cobertura_skills_pct}%` }} /></div>
+          </div>
+          <div>
+            <div className="font-mono uppercase text-muted-foreground text-[10px]">Certificações</div>
+            <div className="font-display text-lg">{r.execution_match.cobertura_certificacoes_pct}%</div>
+            <div className="h-1.5 bg-muted mt-1"><div className="h-full bg-primary" style={{ width: `${r.execution_match.cobertura_certificacoes_pct}%` }} /></div>
+          </div>
+          <div>
+            <div className="font-mono uppercase text-muted-foreground text-[10px]">Headcount</div>
+            <div className="font-display text-lg">{r.execution_match.cobertura_headcount_pct}%</div>
+            <div className="h-1.5 bg-muted mt-1"><div className="h-full bg-success" style={{ width: `${r.execution_match.cobertura_headcount_pct}%` }} /></div>
+          </div>
+        </div>
+
+        {(r.execution_match.gap_skills?.length || r.execution_match.gap_certificacoes?.length || r.execution_match.gap_headcount) ? (
+          <div className="grid md:grid-cols-3 gap-3 text-[11px]">
+            {r.execution_match.gap_skills?.length ? (
+              <div className="border-l-2 border-destructive pl-2">
+                <div className="font-mono uppercase text-[10px] text-destructive">Gap de skills</div>
+                <div>{r.execution_match.gap_skills.join(', ')}</div>
+              </div>
+            ) : null}
+            {r.execution_match.gap_certificacoes?.length ? (
+              <div className="border-l-2 border-destructive pl-2">
+                <div className="font-mono uppercase text-[10px] text-destructive">Gap de certificações</div>
+                <div>{r.execution_match.gap_certificacoes.join(', ')}</div>
+              </div>
+            ) : null}
+            {r.execution_match.gap_headcount ? (
+              <div className="border-l-2 border-warning pl-2">
+                <div className="font-mono uppercase text-[10px] text-warning">Gap de headcount</div>
+                <div>{r.execution_match.gap_headcount}</div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {r.execution_match.alocacao_sugerida?.length ? (
+          <div>
+            <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Alocação sugerida</div>
+            <div className="space-y-1">
+              {r.execution_match.alocacao_sugerida.map((a, i) => (
+                <div key={i} className="text-xs border border-border p-2 flex items-start justify-between gap-3">
+                  <div>
+                    <b>{a.nome}</b> — {a.papel_no_projeto}
+                    <div className="text-[11px] text-muted-foreground">{a.justificativa}</div>
+                  </div>
+                  <div className="text-right font-mono text-[11px] shrink-0">
+                    <div>{a.alocacao_pct}%</div>
+                    {a.custo_hora ? <div className="text-muted-foreground">{formatBRL(a.custo_hora)}/h</div> : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {r.execution_match.observacoes && <div className="text-[11px] text-muted-foreground">{r.execution_match.observacoes}</div>}
+      </div>
+    )}
   </div>
 );
