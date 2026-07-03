@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate, Link } from "react-router-dom";
-import { useAuth, SEED_CREDENTIALS } from "./AuthContext";
+import { useAuth, SEED_CREDENTIALS, SEED_USERS_INFO } from "./AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
