@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Radar, RefreshCw, Loader2, Star, Sparkles, ExternalLink, Filter, Crown, Ban,
-  CheckCircle2, ChevronRight, X, MapPin, Building, Calendar,
+  CheckCircle2, ChevronRight, X, MapPin, Building, Calendar, AlertTriangle,
+  PlayCircle, Clock, Wifi, WifiOff, Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ import {
 import { registrarEvento } from '@/modules/nucleo3/store';
 import type { PncpItem, TriagemResultado } from '../types';
 import { KPI, NivelBadge, PageHeader, formatBRL, formatDate } from '../ui';
+import { DEMO_ITEMS, DEMO_META } from '../demoData';
 
 const MODALIDADES = [
   { id: 6, label: 'Pregão Eletrônico' },
@@ -29,11 +31,18 @@ const MODALIDADES = [
 
 const UFS = ['ALL','AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
+type Status = 'idle' | 'loading' | 'ok' | 'error';
+const AUTO_SYNC_SEC = 60;
+
 export const RadarPage = () => {
   const [items, setItems] = useState<PncpItem[]>([]);
   const [meta, setMeta] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [status, setStatus] = useState<Status>('idle');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [demo, setDemo] = useState(false);
+
+  const [lastSuccess, setLastSuccess] = useState<Date | null>(null);
+  const [nextSyncIn, setNextSyncIn] = useState<number>(AUTO_SYNC_SEC);
 
   const [dias, setDias] = useState(7);
   const [palavra, setPalavra] = useState('');
@@ -45,6 +54,7 @@ export const RadarPage = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [blacklistExtra, setBlacklistExtra] = useState<string[]>([]);
   const intervalRef = useRef<number | null>(null);
+  const countdownRef = useRef<number | null>(null);
 
   const [filtersOpen, setFiltersOpen] = useState(true);
 
@@ -61,7 +71,7 @@ export const RadarPage = () => {
   }, []);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    setStatus('loading'); setErrorMsg(null); setDemo(false);
     try {
       const d = await buscarLicitacoes({
         diasAtras: dias,
@@ -71,18 +81,50 @@ export const RadarPage = () => {
       });
       setItems(d.items);
       setMeta(d.meta);
-      setLastUpdate(new Date());
+      setLastSuccess(new Date());
+      setNextSyncIn(AUTO_SYNC_SEC);
+      setStatus('ok');
     } catch (e: any) {
-      toast.error('Falha ao consultar PNCP', { description: e?.message });
-    } finally { setLoading(false); }
+      const msg = e?.message ?? 'Falha desconhecida ao consultar o PNCP';
+      setErrorMsg(msg);
+      setStatus('error');
+      toast.error('Falha ao consultar PNCP', {
+        description: msg,
+        action: { label: 'Tentar novamente', onClick: () => fetchData() },
+      });
+    }
   }, [dias, palavra, uf, filtroTI, modalidades, valorMinimo, blacklistExtra, incluirDescartados]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  // Auto-refresh só depois de uma primeira sync bem-sucedida (evita loop de "vazio")
   useEffect(() => {
-    if (!autoRefresh) { if (intervalRef.current) window.clearInterval(intervalRef.current); return; }
-    intervalRef.current = window.setInterval(() => fetchData(), 60_000);
-    return () => { if (intervalRef.current) window.clearInterval(intervalRef.current); };
-  }, [autoRefresh, fetchData]);
+    if (!autoRefresh || status !== 'ok' || demo) {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      if (countdownRef.current) window.clearInterval(countdownRef.current);
+      return;
+    }
+    intervalRef.current = window.setInterval(() => fetchData(), AUTO_SYNC_SEC * 1000);
+    setNextSyncIn(AUTO_SYNC_SEC);
+    countdownRef.current = window.setInterval(
+      () => setNextSyncIn((s) => (s <= 1 ? AUTO_SYNC_SEC : s - 1)),
+      1000,
+    );
+    return () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      if (countdownRef.current) window.clearInterval(countdownRef.current);
+    };
+  }, [autoRefresh, status, demo, fetchData]);
+
+  const loadDemo = useCallback(() => {
+    setItems(DEMO_ITEMS);
+    setMeta(DEMO_META);
+    setDemo(true);
+    setStatus('ok');
+    setErrorMsg(null);
+    setLastSuccess(new Date());
+    toast.success('Dataset de exemplo carregado', {
+      description: 'Fluxo completo (Triagem IA → Aprovar) disponível para a demo.',
+    });
+  }, []);
 
   const toggleMod = (id: number) =>
     setModalidades((c) => c.includes(id) ? c.filter((m) => m !== id) : [...c, id]);
@@ -124,9 +166,18 @@ export const RadarPage = () => {
     toast.success(added ? 'Adicionado aos favoritos' : 'Removido dos favoritos');
   };
 
-  const valorTotal = items.reduce((s, i) => s + (i.valorEstimado ?? 0), 0);
-  const candidatos = items.filter((i) => i.status !== 'discarded').length;
-  const aderentesTI = useMemo(() => items.filter((i) => i.aderencia?.ti && i.status !== 'discarded').length, [items]);
+  const candidatosItems = useMemo(() => items.filter((i) => i.status !== 'discarded'), [items]);
+  const valorCandidatos = candidatosItems.reduce((s, i) => s + (i.valorEstimado ?? 0), 0);
+  const candidatos = candidatosItems.length;
+  const totalBruto = meta?.total_bruto ?? 0;
+  const aderentesTI = useMemo(() => candidatosItems.filter((i) => i.aderencia?.ti).length, [candidatosItems]);
+  const isLoading = status === 'loading';
+
+  // Distingue "0 candidatos mas houve descartes" de "PNCP não retornou nada"
+  const emptyReason: 'todos_descartados' | 'sem_registros' | null =
+    status === 'ok' && !demo && candidatos === 0
+      ? (totalBruto > 0 ? 'todos_descartados' : 'sem_registros')
+      : null;
 
   return (
     <>
@@ -136,16 +187,22 @@ export const RadarPage = () => {
         subtitle="Purificação determinística → triagem semântica IA → match de execução contra o quadro real."
         actions={
           <>
+            <SyncIndicator
+              status={status}
+              lastSuccess={lastSuccess}
+              autoRefresh={autoRefresh}
+              nextSyncIn={nextSyncIn}
+              demo={demo}
+            />
             <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest">
-              <span className={`h-2 w-2 rounded-full ${autoRefresh ? 'bg-success animate-pulse' : 'bg-muted'}`} />
-              {autoRefresh ? 'LIVE' : 'PAUSADO'}
               <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh} />
+              Auto
             </div>
             <Button variant="outline" size="sm" onClick={() => setFiltersOpen((s) => !s)}>
               <Filter className="h-3.5 w-3.5 mr-1" />Filtros
             </Button>
-            <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+            <Button variant="outline" size="sm" onClick={fetchData} disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
               <span className="ml-1.5">Atualizar</span>
             </Button>
           </>
@@ -155,31 +212,193 @@ export const RadarPage = () => {
       <div className="px-6 lg:px-8 py-6">
         {/* KPIs topo */}
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 mb-6">
-          <KPI label="Candidatos" value={candidatos} accent="primary" sub="Pós-purificação" />
-          <KPI label="Aderentes TI" value={aderentesTI} accent="accent" />
-          <KPI label="Pipeline" value={formatBRL(valorTotal)} accent="info" />
-          <KPI label="Descartados" value={meta?.descartados ?? 0} accent="destructive" sub={`BL:${meta?.descartados_blacklist ?? 0} • !TI:${meta?.descartados_fora_ti ?? 0} • $:${meta?.descartados_valor ?? 0}`} />
-          <KPI label="Bruto" value={meta?.total_bruto ?? 0} sub={`Janela ${dias}d`} />
-          <KPI label="Sync" value={lastUpdate ? lastUpdate.toLocaleTimeString('pt-BR') : '—'} accent="success" sub="Auto 60s" />
+          {isLoading ? (
+            <>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-[92px] border-2 border-foreground" />
+              ))}
+            </>
+          ) : (
+            <>
+              <KPI
+                label="Candidatos"
+                value={status === 'idle' ? '—' : candidatos}
+                accent="primary"
+                sub={
+                  status === 'idle'
+                    ? 'Execute uma busca'
+                    : `${candidatos} de ${totalBruto || '—'} coletados`
+                }
+              />
+              <KPI
+                label="Aderentes TI"
+                value={status === 'idle' ? '—' : aderentesTI}
+                accent="accent"
+                sub={status === 'idle' ? '—' : 'Pós-purificação'}
+              />
+              <KPI
+                label="Pipeline (candidatos)"
+                value={status === 'idle' ? '—' : formatBRL(valorCandidatos)}
+                accent="info"
+                sub={status === 'idle' ? 'Soma dos candidatos' : `Soma de ${candidatos} candidato${candidatos === 1 ? '' : 's'}`}
+              />
+              <KPI
+                label="Descartados"
+                value={status === 'idle' ? '—' : (meta?.descartados ?? 0)}
+                accent="destructive"
+                sub={
+                  status === 'idle'
+                    ? 'Detalhamento após a busca'
+                    : `BL:${meta?.descartados_blacklist ?? 0} • !TI:${meta?.descartados_fora_ti ?? 0} • $:${meta?.descartados_valor ?? 0}`
+                }
+              />
+              <KPI
+                label="Bruto PNCP"
+                value={status === 'idle' ? '—' : totalBruto}
+                sub={status === 'idle' ? `Janela ${dias}d` : `Janela ${dias}d • ${meta?.blacklistAplicada ?? 0} termos BL`}
+              />
+              <KPI
+                label="Última sync OK"
+                value={lastSuccess ? lastSuccess.toLocaleTimeString('pt-BR') : '—'}
+                accent="success"
+                sub={
+                  demo
+                    ? 'Modo exemplo'
+                    : autoRefresh && status === 'ok'
+                    ? `Próxima em ${nextSyncIn}s`
+                    : autoRefresh
+                    ? 'Aguardando 1ª sync'
+                    : 'Auto pausado'
+                }
+              />
+            </>
+          )}
         </div>
+
+        {/* Banner de erro */}
+        {status === 'error' && (
+          <div className="mb-4 border-2 border-destructive bg-destructive/10 shadow-brutal-sm p-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div className="font-display text-sm">Falha ao consultar o PNCP</div>
+              <div className="text-xs text-muted-foreground mt-0.5 break-words">{errorMsg}</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-1">
+                Nenhum resultado foi zerado silenciosamente — os dados anteriores continuam visíveis se existirem.
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 shrink-0">
+              <Button size="sm" variant="destructive" onClick={fetchData}>
+                <RefreshCw className="h-3.5 w-3.5 mr-1" /> Tentar novamente
+              </Button>
+              <Button size="sm" variant="outline" onClick={loadDemo}>
+                <PlayCircle className="h-3.5 w-3.5 mr-1" /> Carregar exemplo
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Banner do modo demo */}
+        {demo && (
+          <div className="mb-4 border-2 border-foreground bg-accent/30 shadow-brutal-sm p-3 flex items-center gap-3">
+            <Info className="h-4 w-4 shrink-0" />
+            <div className="flex-1 text-xs">
+              <b>Modo exemplo ativo</b> — os {DEMO_ITEMS.length} editais abaixo são fictícios e servem apenas para demonstração. O fluxo Triar com IA → Aprovar como Estratégico continua funcional.
+            </div>
+            <Button size="sm" variant="outline" onClick={fetchData}>
+              <RefreshCw className="h-3.5 w-3.5 mr-1" /> Voltar ao PNCP real
+            </Button>
+          </div>
+        )}
 
         <div className="grid gap-6" style={{ gridTemplateColumns: filtersOpen ? 'minmax(0,1fr) 320px' : 'minmax(0,1fr)' }}>
           {/* Lista de cards */}
           <div className="space-y-3">
-            {loading && items.length === 0 && (
+            {/* Estado inicial (nenhuma busca feita ainda) */}
+            {status === 'idle' && (
+              <div className="border-2 border-dashed border-foreground p-10 lg:p-14 text-center bg-card shadow-brutal-sm">
+                <div className="mx-auto h-14 w-14 grid place-items-center border-2 border-foreground bg-primary/10 mb-4">
+                  <Radar className="h-7 w-7 text-primary" />
+                </div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Nenhuma busca executada
+                </div>
+                <div className="font-display text-xl lg:text-2xl mt-1">
+                  Configure os filtros e clique em <span className="text-primary">Atualizar</span> para consultar o PNCP
+                </div>
+                <div className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+                  O radar não faz consulta automática antes da sua ação — evita gerar tráfego e KPIs em zero sem contexto.
+                </div>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                  <Button
+                    onClick={() => { setDias(7); setUf('ALL'); setPalavra(''); fetchData(); }}
+                    variant="primary"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-1" /> Buscar últimos 7 dias, todo o Brasil
+                  </Button>
+                  <Button variant="outline" onClick={loadDemo}>
+                    <PlayCircle className="h-4 w-4 mr-1" /> Carregar exemplo (demo)
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Loading skeleton */}
+            {isLoading && (
               <div className="space-y-3">
                 {[0,1,2,3].map((i) => <Skeleton key={i} className="h-32 border-2 border-foreground" />)}
               </div>
             )}
-            {!loading && items.length === 0 && (
-              <div className="border-2 border-dashed border-foreground p-12 text-center bg-card">
-                <Radar className="h-8 w-8 inline text-muted-foreground" />
-                <div className="mt-3 font-display text-lg">Nenhuma licitação para os filtros atuais</div>
-                <div className="text-xs text-muted-foreground mt-1">Ajuste janela, valor mínimo ou desligue "Só TI".</div>
+
+            {/* Empty após busca real: todos descartados */}
+            {emptyReason === 'todos_descartados' && (
+              <div className="border-2 border-foreground bg-card shadow-brutal-sm p-10 text-center">
+                <div className="mx-auto h-12 w-12 grid place-items-center border-2 border-foreground bg-destructive/10 mb-3">
+                  <Ban className="h-6 w-6 text-destructive" />
+                </div>
+                <div className="font-display text-lg">
+                  0 candidatos — mas <span className="text-destructive">{meta?.descartados ?? totalBruto} editais</span> foram descartados na purificação
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                  Blacklist: {meta?.descartados_blacklist ?? 0} • Fora de TI: {meta?.descartados_fora_ti ?? 0} • Abaixo do valor mínimo: {meta?.descartados_valor ?? 0}
+                </div>
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => { setIncluirDescartados(true); fetchData(); }}
+                  >
+                    Ver descartados
+                  </Button>
+                  <Button variant="ghost" onClick={loadDemo}>
+                    <PlayCircle className="h-4 w-4 mr-1" /> Carregar exemplo
+                  </Button>
+                </div>
               </div>
             )}
 
-            {items.map((it) => (
+            {/* Empty após busca real: PNCP não retornou nada */}
+            {emptyReason === 'sem_registros' && (
+              <div className="border-2 border-foreground bg-card shadow-brutal-sm p-10 text-center">
+                <div className="mx-auto h-12 w-12 grid place-items-center border-2 border-foreground bg-muted mb-3">
+                  <WifiOff className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="font-display text-lg">O PNCP não retornou nenhum registro na janela consultada</div>
+                <div className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                  Isso é comum fora do horário comercial, em feriados ou quando os filtros estão muito restritivos.
+                  Tente alargar a janela de dias ou remover o filtro de UF.
+                </div>
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                  <Button variant="outline" onClick={() => { setDias(30); setUf('ALL'); fetchData(); }}>
+                    Ampliar para 30 dias · Brasil inteiro
+                  </Button>
+                  <Button variant="primary" onClick={loadDemo}>
+                    <PlayCircle className="h-4 w-4 mr-1" /> Carregar exemplo
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Lista de resultados */}
+            {status === 'ok' && items.length > 0 && items.map((it) => (
               <BidCard
                 key={it.id}
                 item={it}
@@ -259,6 +478,7 @@ export const RadarPage = () => {
           )}
         </div>
       </div>
+
 
       {/* Detalhe / Triagem em Sheet lateral */}
       <Sheet open={detailOpen} onOpenChange={setDetailOpen}>
