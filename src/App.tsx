@@ -28,9 +28,12 @@ import { PerfilPage } from "./modules/licitacoes/pages/PerfilPage";
 import { PerfisPage } from "./modules/licitacoes/pages/PerfisPage";
 import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 
-import { GovernancaPage } from "./modules/nucleo3/pages/GovernancaPage";
-import { AutomacoesPage } from "./modules/nucleo3/pages/AutomacoesPage";
-import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
+import { DashboardAutomacoesPage } from "./modules/automacoes/pages/DashboardAutomacoesPage";
+import { EsteiraPage } from "./modules/automacoes/pages/EsteiraPage";
+import { CatalogoPage } from "./modules/automacoes/pages/CatalogoPage";
+import { DetalheAutomacaoPage } from "./modules/automacoes/pages/DetalheAutomacaoPage";
+import { OfertasPage } from "./modules/automacoes/pages/OfertasPage";
+import { ConfigPage as AutomacoesConfigPage } from "./modules/automacoes/pages/ConfigPage";
 import { AcessosPage } from "./modules/nucleo1/pages/AcessosPage";
 import { RequireModuleAccess } from "./modules/platform/RequireModuleAccess";
 import type { Modulo } from "./modules/nucleo1/AuthContext";
