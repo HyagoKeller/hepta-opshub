@@ -44,7 +44,7 @@ const cores: Core[] = [
     id: "02",
     number: "02",
     anchor: "nucleo-licitacoes",
-    route: "/licitacoes",
+    route: "/app/licitacoes",
     routeLabel: "Abrir Radar de Licitações",
     icon: Trophy,
     title: "Gestão de Licitações",

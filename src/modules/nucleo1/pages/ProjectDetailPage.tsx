@@ -46,7 +46,7 @@ export const ProjectDetailPage = () => {
       <div className="p-8">
         <p>Projeto não encontrado.</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link to="/projetos-squads/app/portfolio"><ArrowLeft /> Voltar</Link>
+          <Link to="/app/projetos/portfolio"><ArrowLeft /> Voltar</Link>
         </Button>
       </div>
     );
@@ -70,7 +70,7 @@ export const ProjectDetailPage = () => {
         actions={
           <>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/projetos-squads/app/portfolio"><ArrowLeft /> Portfólio</Link>
+              <Link to="/app/projetos/portfolio"><ArrowLeft /> Portfólio</Link>
             </Button>
             <Button variant="primary" size="sm" onClick={() => setEditProjOpen(true)}>
               <Pencil /> Editar projeto

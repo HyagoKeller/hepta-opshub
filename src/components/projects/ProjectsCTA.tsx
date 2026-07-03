@@ -21,7 +21,7 @@ export const ProjectsCTA = () => (
           </div>
           <div className="lg:col-span-4 flex flex-col gap-3">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/projetos-squads/login">Entrar no app <ArrowRight className="ml-1" /></Link>
+              <Link to="/app/login">Entrar no app <ArrowRight className="ml-1" /></Link>
             </Button>
             <Button variant="outlineLight" size="xl" asChild>
               <a href="#capacidades">Revisitar capacidades</a>

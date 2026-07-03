@@ -57,7 +57,7 @@ export const DashboardPage = () => {
             <div className="divide-y-2 divide-foreground">
               {projects.filter((p) => p.saude !== "verde").slice(0, 5).map((p) => (
                 <Link
-                  key={p.id} to={`/projetos-squads/app/projeto/${p.id}`}
+                  key={p.id} to={`/app/projetos/projeto/${p.id}`}
                   className="grid grid-cols-12 gap-3 items-center py-3 hover:bg-muted/40 transition-smooth"
                 >
                   <div className="col-span-1"><HealthDot saude={p.saude} /></div>
