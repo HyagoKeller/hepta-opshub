@@ -30,6 +30,10 @@ import { PerfilPage } from "./modules/licitacoes/pages/PerfilPage";
 import { PerfisPage } from "./modules/licitacoes/pages/PerfisPage";
 import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 
+import { GovernancaPage } from "./modules/nucleo3/pages/GovernancaPage";
+import { AutomacoesPage } from "./modules/nucleo3/pages/AutomacoesPage";
+import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -61,6 +65,10 @@ const App = () => (
             <Route path="/licitacoes/estrategicas" element={<LicitacoesShell><EstrategicasPage /></LicitacoesShell>} />
             <Route path="/licitacoes/perfil" element={<LicitacoesShell><PerfilPage /></LicitacoesShell>} />
             <Route path="/licitacoes/perfis" element={<LicitacoesShell><PerfisPage /></LicitacoesShell>} />
+
+            <Route path="/governanca" element={<LicitacoesShell><GovernancaPage /></LicitacoesShell>} />
+            <Route path="/governanca/automacoes" element={<LicitacoesShell><AutomacoesPage /></LicitacoesShell>} />
+            <Route path="/governanca/auditoria" element={<LicitacoesShell><AuditoriaPage /></LicitacoesShell>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
