@@ -34,6 +34,39 @@ const UFS = ['ALL','AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','
 type Status = 'idle' | 'loading' | 'ok' | 'error';
 const AUTO_SYNC_SEC = 60;
 
+const SyncIndicator = ({
+  status, lastSuccess, autoRefresh, nextSyncIn, demo,
+}: {
+  status: Status; lastSuccess: Date | null; autoRefresh: boolean; nextSyncIn: number; demo: boolean;
+}) => {
+  const dot =
+    demo ? 'bg-accent' :
+    status === 'loading' ? 'bg-info animate-pulse' :
+    status === 'error' ? 'bg-destructive' :
+    status === 'ok' ? 'bg-success animate-pulse' :
+    'bg-muted';
+  const label =
+    demo ? 'DEMO' :
+    status === 'loading' ? 'SYNC…' :
+    status === 'error' ? 'ERRO' :
+    status === 'ok' ? 'ONLINE' :
+    'AGUARDANDO';
+  return (
+    <div className="flex flex-col items-end text-right leading-tight">
+      <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest">
+        <span className={cn('h-2 w-2 rounded-full', dot)} />{label}
+      </div>
+      <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2">
+        <Clock className="h-3 w-3" />
+        <span>Última OK: <b className="text-foreground">{lastSuccess ? lastSuccess.toLocaleTimeString('pt-BR') : '—'}</b></span>
+        {autoRefresh && status === 'ok' && !demo && (
+          <span className="flex items-center gap-1"><Wifi className="h-3 w-3" />Próxima {nextSyncIn}s</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const RadarPage = () => {
   const [items, setItems] = useState<PncpItem[]>([]);
   const [meta, setMeta] = useState<any>(null);
