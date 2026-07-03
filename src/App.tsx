@@ -67,29 +67,32 @@ const App = () => (
               <Route path="/app" element={wrap(<DashboardPage />)} />
 
               {/* Núcleo 01 — Projetos & Squads */}
-              <Route path="/app/projetos" element={wrap(<DashboardPage />)} />
-              <Route path="/app/projetos/portfolio" element={wrap(<PortfolioPage />)} />
-              <Route path="/app/projetos/projeto/:id" element={wrap(<ProjectDetailPage />)} />
-              <Route path="/app/projetos/squads" element={wrap(<SquadsPage />)} />
-              <Route path="/app/projetos/capacidade" element={wrap(<CapacityPage />)} />
-              <Route path="/app/projetos/dependencias" element={wrap(<DependenciesPage />)} />
-              <Route path="/app/projetos/cronograma" element={wrap(<SchedulePage />)} />
-              <Route path="/app/projetos/admin" element={wrap(<AdminPage />)} />
+              <Route path="/app/projetos" element={guard("projetos_squads", <DashboardPage />)} />
+              <Route path="/app/projetos/portfolio" element={guard("projetos_squads", <PortfolioPage />)} />
+              <Route path="/app/projetos/projeto/:id" element={guard("projetos_squads", <ProjectDetailPage />)} />
+              <Route path="/app/projetos/squads" element={guard("projetos_squads", <SquadsPage />)} />
+              <Route path="/app/projetos/capacidade" element={guard("projetos_squads", <CapacityPage />)} />
+              <Route path="/app/projetos/dependencias" element={guard("projetos_squads", <DependenciesPage />)} />
+              <Route path="/app/projetos/cronograma" element={guard("projetos_squads", <SchedulePage />)} />
+              <Route path="/app/projetos/admin" element={guard("projetos_squads", <AdminPage />)} />
+
+              {/* Admin transversal (apenas perfil=admin) */}
+              <Route path="/app/admin/acessos" element={wrap(<AcessosPage />)} />
 
               {/* Núcleo 02 — Licitações */}
-              <Route path="/app/licitacoes" element={wrap(<RadarPage />)} />
-              <Route path="/app/licitacoes/triagem" element={wrap(<TriagemPage />)} />
-              <Route path="/app/licitacoes/atestados" element={wrap(<AtestadosPage />)} />
-              <Route path="/app/licitacoes/solucoes" element={wrap(<SolucoesPage />)} />
-              <Route path="/app/licitacoes/favoritos" element={wrap(<FavoritosPage />)} />
-              <Route path="/app/licitacoes/estrategicas" element={wrap(<EstrategicasPage />)} />
-              <Route path="/app/licitacoes/perfil" element={wrap(<PerfilPage />)} />
-              <Route path="/app/licitacoes/perfis" element={wrap(<PerfisPage />)} />
+              <Route path="/app/licitacoes" element={guard("licitacoes", <RadarPage />)} />
+              <Route path="/app/licitacoes/triagem" element={guard("licitacoes", <TriagemPage />)} />
+              <Route path="/app/licitacoes/atestados" element={guard("licitacoes", <AtestadosPage />)} />
+              <Route path="/app/licitacoes/solucoes" element={guard("licitacoes", <SolucoesPage />)} />
+              <Route path="/app/licitacoes/favoritos" element={guard("licitacoes", <FavoritosPage />)} />
+              <Route path="/app/licitacoes/estrategicas" element={guard("licitacoes", <EstrategicasPage />)} />
+              <Route path="/app/licitacoes/perfil" element={guard("licitacoes", <PerfilPage />)} />
+              <Route path="/app/licitacoes/perfis" element={guard("licitacoes", <PerfisPage />)} />
 
               {/* Núcleo 03 — Automações & Governança */}
-              <Route path="/app/automacoes" element={wrap(<GovernancaPage />)} />
-              <Route path="/app/automacoes/catalogo" element={wrap(<AutomacoesPage />)} />
-              <Route path="/app/automacoes/auditoria" element={wrap(<AuditoriaPage />)} />
+              <Route path="/app/automacoes" element={guard("automacoes", <GovernancaPage />)} />
+              <Route path="/app/automacoes/catalogo" element={guard("automacoes", <AutomacoesPage />)} />
+              <Route path="/app/automacoes/auditoria" element={guard("automacoes", <AuditoriaPage />)} />
 
               {/* Compat: rotas antigas → novas */}
               <Route path="/projetos-squads" element={<Navigate to="/" replace />} />
