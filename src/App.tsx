@@ -66,6 +66,10 @@ const App = () => (
             <Route path="/licitacoes/perfil" element={<LicitacoesShell><PerfilPage /></LicitacoesShell>} />
             <Route path="/licitacoes/perfis" element={<LicitacoesShell><PerfisPage /></LicitacoesShell>} />
 
+            <Route path="/governanca" element={<LicitacoesShell><GovernancaPage /></LicitacoesShell>} />
+            <Route path="/governanca/automacoes" element={<LicitacoesShell><AutomacoesPage /></LicitacoesShell>} />
+            <Route path="/governanca/auditoria" element={<LicitacoesShell><AuditoriaPage /></LicitacoesShell>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
           </DataProvider>
