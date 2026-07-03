@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, Briefcase, Users, GanttChartSquare, Activity, Network, Settings,
   Radar, FileSearch, Award, Boxes, Star, Building2, Crown, ShieldCheck, Workflow, ScrollText,
+  Zap, KanbanSquare, ListChecks, PackageCheck, Cog,
 } from "lucide-react";
 import type { ModuloId } from "../nucleo1/AuthContext";
 
@@ -12,7 +13,7 @@ export type NucleoDef = {
   label: string;
   fullLabel: string;
   home: string;
-  color: "primary" | "accent" | "steel";
+  color: "primary" | "accent" | "steel" | "success";
   items: NavItem[];
 };
 
