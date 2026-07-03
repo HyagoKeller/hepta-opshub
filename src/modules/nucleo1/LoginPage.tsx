@@ -26,7 +26,7 @@ export const LoginPage = () => {
   const [showHint, setShowHint] = useState(false);
 
   if (user) {
-    const from = (location.state as any)?.from?.pathname ?? "/projetos-squads/app";
+    const from = (location.state as any)?.from?.pathname ?? "/app";
     return <Navigate to={from} replace />;
   }
 
@@ -35,7 +35,7 @@ export const LoginPage = () => {
     setLoading(true); setError(null);
     const res = await login(email, password);
     setLoading(false);
-    if (res.ok) navigate("/projetos-squads/app", { replace: true });
+    if (res.ok) navigate("/app", { replace: true });
     else setError(res.error ?? "Falha de autenticação");
   };
 
