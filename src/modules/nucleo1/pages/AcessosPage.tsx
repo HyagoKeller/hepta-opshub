@@ -137,11 +137,7 @@ const EditAccessDialog = ({
 }) => {
   const [selected, setSelected] = useState<Modulo[]>([]);
 
-  // Reset quando abre
   const open = !!user;
-  if (open && user && (selected.length === 0 || (user && !selectedMatches(selected, user)))) {
-    // hidrata apenas na abertura
-  }
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
