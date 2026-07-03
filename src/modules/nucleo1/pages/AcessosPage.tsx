@@ -196,5 +196,3 @@ const EditAccessDialog = ({
   );
 };
 
-const selectedMatches = (sel: Modulo[], u: Usuario) =>
-  sel.length === u.modulosPermitidos.length && sel.every((m) => u.modulosPermitidos.includes(m));
