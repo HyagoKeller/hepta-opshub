@@ -28,9 +28,12 @@ import { PerfilPage } from "./modules/licitacoes/pages/PerfilPage";
 import { PerfisPage } from "./modules/licitacoes/pages/PerfisPage";
 import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 
-import { GovernancaPage } from "./modules/nucleo3/pages/GovernancaPage";
-import { AutomacoesPage } from "./modules/nucleo3/pages/AutomacoesPage";
-import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
+import { DashboardAutomacoesPage } from "./modules/automacoes/pages/DashboardAutomacoesPage";
+import { EsteiraPage } from "./modules/automacoes/pages/EsteiraPage";
+import { CatalogoPage } from "./modules/automacoes/pages/CatalogoPage";
+import { DetalheAutomacaoPage } from "./modules/automacoes/pages/DetalheAutomacaoPage";
+import { OfertasPage } from "./modules/automacoes/pages/OfertasPage";
+import { ConfigPage as AutomacoesConfigPage } from "./modules/automacoes/pages/ConfigPage";
 import { AcessosPage } from "./modules/nucleo1/pages/AcessosPage";
 import { RequireModuleAccess } from "./modules/platform/RequireModuleAccess";
 import type { Modulo } from "./modules/nucleo1/AuthContext";
@@ -89,10 +92,13 @@ const App = () => (
               <Route path="/app/licitacoes/perfil" element={guard("licitacoes", <PerfilPage />)} />
               <Route path="/app/licitacoes/perfis" element={guard("licitacoes", <PerfisPage />)} />
 
-              {/* Núcleo 03 — Automações & Governança */}
-              <Route path="/app/automacoes" element={guard("automacoes", <GovernancaPage />)} />
-              <Route path="/app/automacoes/catalogo" element={guard("automacoes", <AutomacoesPage />)} />
-              <Route path="/app/automacoes/auditoria" element={guard("automacoes", <AuditoriaPage />)} />
+              {/* Núcleo 03 — Automações & Transformação Digital */}
+              <Route path="/app/automacoes" element={guard("automacoes", <DashboardAutomacoesPage />)} />
+              <Route path="/app/automacoes/esteira" element={guard("automacoes", <EsteiraPage />)} />
+              <Route path="/app/automacoes/catalogo" element={guard("automacoes", <CatalogoPage />)} />
+              <Route path="/app/automacoes/ofertas" element={guard("automacoes", <OfertasPage />)} />
+              <Route path="/app/automacoes/config" element={guard("automacoes", <AutomacoesConfigPage />)} />
+              <Route path="/app/automacoes/:id" element={guard("automacoes", <DetalheAutomacaoPage />)} />
 
               {/* Compat: rotas antigas → novas */}
               <Route path="/projetos-squads" element={<Navigate to="/" replace />} />
@@ -105,7 +111,8 @@ const App = () => (
 
               <Route path="/governanca" element={<Navigate to="/app/automacoes" replace />} />
               <Route path="/governanca/automacoes" element={<Navigate to="/app/automacoes/catalogo" replace />} />
-              <Route path="/governanca/auditoria" element={<Navigate to="/app/automacoes/auditoria" replace />} />
+              <Route path="/governanca/auditoria" element={<Navigate to="/app/automacoes" replace />} />
+              <Route path="/app/automacoes/auditoria" element={<Navigate to="/app/automacoes" replace />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

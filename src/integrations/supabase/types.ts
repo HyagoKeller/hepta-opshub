@@ -59,6 +59,157 @@ export type Database = {
         }
         Relationships: []
       }
+      automacao_historico: {
+        Row: {
+          automacao_id: string
+          autor_id: string | null
+          autor_nome: string | null
+          criado_em: string
+          estagio_anterior: string | null
+          estagio_novo: string
+          id: string
+          nota: string | null
+        }
+        Insert: {
+          automacao_id: string
+          autor_id?: string | null
+          autor_nome?: string | null
+          criado_em?: string
+          estagio_anterior?: string | null
+          estagio_novo: string
+          id?: string
+          nota?: string | null
+        }
+        Update: {
+          automacao_id?: string
+          autor_id?: string | null
+          autor_nome?: string | null
+          criado_em?: string
+          estagio_anterior?: string | null
+          estagio_novo?: string
+          id?: string
+          nota?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automacao_historico_automacao_id_fkey"
+            columns: ["automacao_id"]
+            isOneToOne: false
+            referencedRelation: "automacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automacao_ofertas: {
+        Row: {
+          atualizado_em: string
+          automacao_id: string
+          clientes_aplicaveis: string[]
+          criado_em: string
+          descricao_comercial: string | null
+          id: string
+          margem_estimada: number | null
+          nome_oferta: string
+          status: string
+        }
+        Insert: {
+          atualizado_em?: string
+          automacao_id: string
+          clientes_aplicaveis?: string[]
+          criado_em?: string
+          descricao_comercial?: string | null
+          id?: string
+          margem_estimada?: number | null
+          nome_oferta: string
+          status?: string
+        }
+        Update: {
+          atualizado_em?: string
+          automacao_id?: string
+          clientes_aplicaveis?: string[]
+          criado_em?: string
+          descricao_comercial?: string | null
+          id?: string
+          margem_estimada?: number | null
+          nome_oferta?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automacao_ofertas_automacao_id_fkey"
+            columns: ["automacao_id"]
+            isOneToOne: false
+            referencedRelation: "automacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automacoes: {
+        Row: {
+          atualizado_em: string
+          complexidade: string
+          criado_em: string
+          custo_estimado: number | null
+          descricao: string | null
+          economia_estimada: number | null
+          economia_realizada: number | null
+          estagio: string
+          id: string
+          maturidade: string
+          nome: string
+          nucleo_origem_id: string | null
+          responsavel_id: string | null
+          responsavel_nome: string | null
+          reusavel: boolean
+          risco: string
+          stack_integracoes: string[]
+          tags: string[]
+          tipo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          complexidade?: string
+          criado_em?: string
+          custo_estimado?: number | null
+          descricao?: string | null
+          economia_estimada?: number | null
+          economia_realizada?: number | null
+          estagio?: string
+          id?: string
+          maturidade?: string
+          nome: string
+          nucleo_origem_id?: string | null
+          responsavel_id?: string | null
+          responsavel_nome?: string | null
+          reusavel?: boolean
+          risco?: string
+          stack_integracoes?: string[]
+          tags?: string[]
+          tipo?: string
+        }
+        Update: {
+          atualizado_em?: string
+          complexidade?: string
+          criado_em?: string
+          custo_estimado?: number | null
+          descricao?: string | null
+          economia_estimada?: number | null
+          economia_realizada?: number | null
+          estagio?: string
+          id?: string
+          maturidade?: string
+          nome?: string
+          nucleo_origem_id?: string | null
+          responsavel_id?: string | null
+          responsavel_nome?: string | null
+          reusavel?: boolean
+          risco?: string
+          stack_integracoes?: string[]
+          tags?: string[]
+          tipo?: string
+        }
+        Relationships: []
+      }
       company_profile: {
         Row: {
           atualizado_em: string

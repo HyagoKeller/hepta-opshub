@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, Briefcase, Users, GanttChartSquare, Activity, Network, Settings,
   Radar, FileSearch, Award, Boxes, Star, Building2, Crown, ShieldCheck, Workflow, ScrollText,
+  Zap, KanbanSquare, ListChecks, PackageCheck, Cog,
 } from "lucide-react";
 import type { ModuloId } from "../nucleo1/AuthContext";
 
@@ -12,7 +13,7 @@ export type NucleoDef = {
   label: string;
   fullLabel: string;
   home: string;
-  color: "primary" | "accent" | "steel";
+  color: "primary" | "accent" | "steel" | "success";
   items: NavItem[];
 };
 
@@ -57,13 +58,15 @@ export const NUCLEOS: NucleoDef[] = [
     id: "nucleo3",
     code: "03",
     label: "Automações",
-    fullLabel: "Núcleo 03 — Automações & Governança",
+    fullLabel: "Núcleo 03 — Automações & Transformação Digital",
     home: "/app/automacoes",
-    color: "steel",
+    color: "success",
     items: [
-      { to: "/app/automacoes", end: true, label: "Governança", icon: ShieldCheck },
-      { to: "/app/automacoes/catalogo", label: "Catálogo", icon: Workflow },
-      { to: "/app/automacoes/auditoria", label: "Auditoria", icon: ScrollText },
+      { to: "/app/automacoes", end: true, label: "Dashboard", icon: LayoutDashboard },
+      { to: "/app/automacoes/esteira", label: "Esteira (Kanban)", icon: KanbanSquare },
+      { to: "/app/automacoes/catalogo", label: "Catálogo", icon: ListChecks },
+      { to: "/app/automacoes/ofertas", label: "Ofertas & Cases", icon: PackageCheck },
+      { to: "/app/automacoes/config", label: "Configuração", icon: Cog },
     ],
   },
 ];
