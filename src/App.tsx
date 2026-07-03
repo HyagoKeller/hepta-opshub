@@ -30,6 +30,10 @@ import { PerfilPage } from "./modules/licitacoes/pages/PerfilPage";
 import { PerfisPage } from "./modules/licitacoes/pages/PerfisPage";
 import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 
+import { GovernancaPage } from "./modules/nucleo3/pages/GovernancaPage";
+import { AutomacoesPage } from "./modules/nucleo3/pages/AutomacoesPage";
+import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
