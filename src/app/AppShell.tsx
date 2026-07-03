@@ -15,6 +15,7 @@ const accentBtn: Record<NucleoDef["color"], string> = {
   primary: "bg-primary text-primary-foreground",
   accent: "bg-accent text-accent-foreground",
   steel: "bg-steel text-steel-foreground",
+  success: "bg-success text-success-foreground",
 };
 
 export const AppShell = ({ children }: { children: ReactNode }) => {
