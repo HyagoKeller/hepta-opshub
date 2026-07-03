@@ -31,10 +31,15 @@ import { EstrategicasPage } from "./modules/licitacoes/pages/EstrategicasPage";
 import { GovernancaPage } from "./modules/nucleo3/pages/GovernancaPage";
 import { AutomacoesPage } from "./modules/nucleo3/pages/AutomacoesPage";
 import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
+import { AcessosPage } from "./modules/nucleo1/pages/AcessosPage";
+import { RequireModuleAccess } from "./modules/platform/RequireModuleAccess";
+import type { Modulo } from "./modules/nucleo1/AuthContext";
 
 const queryClient = new QueryClient();
 
 const wrap = (node: React.ReactNode) => <AppShell>{node}</AppShell>;
+const guard = (modulo: Modulo, node: React.ReactNode) =>
+  <AppShell><RequireModuleAccess modulo={modulo}>{node}</RequireModuleAccess></AppShell>;
 
 // Redireciona uma rota antiga (prefixo `from`) para `to`, preservando o restante do path.
 const LegacyRedirect = ({ from, to }: { from: string; to: string }) => {
