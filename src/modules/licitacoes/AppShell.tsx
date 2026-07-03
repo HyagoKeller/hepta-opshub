@@ -1,2 +1,2 @@
-// Compat: shell unificado vive em src/modules/platform/PlatformShell.tsx
-export { PlatformShell as LicitacoesShell } from "../platform/PlatformShell";
+// Compat: shell único vive em src/app/AppShell.tsx
+export { AppShell as LicitacoesShell } from "@/app/AppShell";

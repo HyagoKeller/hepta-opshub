@@ -64,7 +64,7 @@ export const SquadsPage = () => {
                 <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Projetos vinculados</div>
                 <div className="space-y-1">
                   {projetos.map((p) => (
-                    <Link key={p.id} to={`/projetos-squads/app/projeto/${p.id}`} className="block border border-foreground px-2 py-1 text-xs hover:bg-accent/30">
+                    <Link key={p.id} to={`/app/projetos/projeto/${p.id}`} className="block border border-foreground px-2 py-1 text-xs hover:bg-accent/30">
                       <span className="font-mono text-[10px] text-muted-foreground mr-2">{p.codigo}</span>
                       {p.nome}
                     </Link>

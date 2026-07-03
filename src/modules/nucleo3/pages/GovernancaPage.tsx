@@ -44,21 +44,21 @@ export const GovernancaPage = () => {
 
         <div className="grid lg:grid-cols-3 gap-4">
           <Card
-            to="/governanca/automacoes"
+            to="/app/automacoes/catalogo"
             icon={<Workflow className="h-5 w-5" />}
             title="Catálogo de Automações"
             desc="Gatilhos operacionais entre núcleos (edital aprovado → projeto, capacidade crítica → alerta)."
             cta="Abrir catálogo"
           />
           <Card
-            to="/governanca/auditoria"
+            to="/app/automacoes/auditoria"
             icon={<ScrollText className="h-5 w-5" />}
             title="Trilha de Auditoria"
             desc="Eventos imutáveis de aprovação de editais, criação de projetos e mudanças críticas."
             cta="Ver eventos"
           />
           <Card
-            to="/projetos-squads/app"
+            to="/app/projetos"
             icon={<Briefcase className="h-5 w-5" />}
             title="Ir para Projetos & Squads"
             desc="Cruzar demanda de editais BID com capacidade real do quadro."

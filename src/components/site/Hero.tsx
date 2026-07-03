@@ -33,7 +33,7 @@ export const Hero = () => {
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Button variant="primary" size="xl" asChild>
-                <a href="/projetos-squads"><Play className="mr-1" /> Explorar Projetos & Squads <ArrowRight className="ml-1" /></a>
+                <a href="/app/login"><Play className="mr-1" /> Acessar HeptaProject <ArrowRight className="ml-1" /></a>
               </Button>
               <Button variant="outline" size="xl" asChild>
                 <a href="#visao"><Layers className="mr-1" /> Conhecer a visão</a>

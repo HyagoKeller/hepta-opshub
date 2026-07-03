@@ -78,7 +78,7 @@ export const PortfolioPage = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((p) => (
               <div key={p.id} className="border-2 border-foreground bg-card p-5 shadow-brutal-sm hover-brutal relative group">
-                <Link to={`/projetos-squads/app/projeto/${p.id}`} className="block">
+                <Link to={`/app/projetos/projeto/${p.id}`} className="block">
                   <div className="flex items-start justify-between mb-2">
                     <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{p.codigo}</div>
                     <HealthDot saude={p.saude} />
@@ -133,7 +133,7 @@ export const PortfolioPage = () => {
                 {filtered.map((p) => (
                   <tr key={p.id} className="hover:bg-muted/40">
                     <td className="p-3 font-mono text-xs">{p.codigo}</td>
-                    <td><Link to={`/projetos-squads/app/projeto/${p.id}`} className="font-bold hover:underline">{p.nome}</Link></td>
+                    <td><Link to={`/app/projetos/projeto/${p.id}`} className="font-bold hover:underline">{p.nome}</Link></td>
                     <td className="text-xs">{helpersLocal.getCliente(p.clienteId)?.nome}</td>
                     <td className="text-xs">{helpersLocal.getNucleo(p.nucleoId)?.nome}</td>
                     <td><StatusBadge status={p.status} /></td>

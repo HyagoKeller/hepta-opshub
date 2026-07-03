@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/modules/nucleo1/AuthContext";
 
 const navItems = [
   { label: "Visão", href: "/#visao" },
-  { label: "Projetos & Squads", href: "/projetos-squads", route: true },
+  { label: "Projetos & Squads", href: "/#nucleo-projetos" },
   { label: "Licitações", href: "/#nucleo-licitacoes" },
   { label: "Automações", href: "/#nucleo-automacoes" },
   { label: "Plataforma", href: "/#plataforma" },
@@ -18,6 +19,9 @@ const HeptaMark = () => (
 );
 
 export const SiteHeader = () => {
+  const { user } = useAuth();
+  const target = user ? "/app" : "/app/login";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-foreground bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
@@ -34,30 +38,20 @@ export const SiteHeader = () => {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
-          {navItems.map((item) =>
-            item.route ? (
-              <Link
-                key={item.href}
-                to={item.href}
-                className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <a
-                key={item.href}
-                href={item.href}
-                className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
-              >
-                {item.label}
-              </a>
-            ),
-          )}
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="px-3 py-2 text-xs font-bold uppercase tracking-wide hover:bg-accent hover:text-accent-foreground transition-smooth"
+            >
+              {item.label}
+            </a>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">
           <Button variant="primary" size="sm" asChild>
-            <Link to="/projetos-squads">Acessar Projetos & Squads</Link>
+            <Link to={target}>Acessar HeptaProject</Link>
           </Button>
         </div>
       </div>

@@ -1,15 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import ProjectsSquads from "./pages/ProjectsSquads.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import { AuthProvider } from "./modules/nucleo1/AuthContext";
 import { DataProvider } from "./modules/nucleo1/DataStore";
-import { AppShell } from "./modules/nucleo1/AppShell";
+import { AppShell } from "./app/AppShell";
 import { LoginPage } from "./modules/nucleo1/LoginPage";
 import { DashboardPage } from "./modules/nucleo1/pages/DashboardPage";
 import { PortfolioPage } from "./modules/nucleo1/pages/PortfolioPage";
@@ -20,7 +19,6 @@ import { DependenciesPage } from "./modules/nucleo1/pages/DependenciesPage";
 import { SchedulePage } from "./modules/nucleo1/pages/SchedulePage";
 import { AdminPage } from "./modules/nucleo1/pages/AdminPage";
 
-import { LicitacoesShell } from "./modules/licitacoes/AppShell";
 import { RadarPage } from "./modules/licitacoes/pages/RadarPage";
 import { TriagemPage } from "./modules/licitacoes/pages/TriagemPage";
 import { AtestadosPage } from "./modules/licitacoes/pages/AtestadosPage";
@@ -36,6 +34,15 @@ import { AuditoriaPage } from "./modules/nucleo3/pages/AuditoriaPage";
 
 const queryClient = new QueryClient();
 
+const wrap = (node: React.ReactNode) => <AppShell>{node}</AppShell>;
+
+// Redireciona uma rota antiga (prefixo `from`) para `to`, preservando o restante do path.
+const LegacyRedirect = ({ from, to }: { from: string; to: string }) => {
+  const loc = useLocation();
+  const rest = loc.pathname.startsWith(from) ? loc.pathname.slice(from.length) : "";
+  return <Navigate to={`${to}${rest}${loc.search}${loc.hash}`} replace />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -44,34 +51,56 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <DataProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/projetos-squads" element={<ProjectsSquads />} />
-            <Route path="/projetos-squads/login" element={<LoginPage />} />
-            <Route path="/projetos-squads/app" element={<AppShell><DashboardPage /></AppShell>} />
-            <Route path="/projetos-squads/app/portfolio" element={<AppShell><PortfolioPage /></AppShell>} />
-            <Route path="/projetos-squads/app/projeto/:id" element={<AppShell><ProjectDetailPage /></AppShell>} />
-            <Route path="/projetos-squads/app/squads" element={<AppShell><SquadsPage /></AppShell>} />
-            <Route path="/projetos-squads/app/capacidade" element={<AppShell><CapacityPage /></AppShell>} />
-            <Route path="/projetos-squads/app/dependencias" element={<AppShell><DependenciesPage /></AppShell>} />
-            <Route path="/projetos-squads/app/cronograma" element={<AppShell><SchedulePage /></AppShell>} />
-            <Route path="/projetos-squads/app/admin" element={<AppShell><AdminPage /></AppShell>} />
+            <Routes>
+              {/* Landing pública */}
+              <Route path="/" element={<Index />} />
 
-            <Route path="/licitacoes" element={<LicitacoesShell><RadarPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/triagem" element={<LicitacoesShell><TriagemPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/atestados" element={<LicitacoesShell><AtestadosPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/solucoes" element={<LicitacoesShell><SolucoesPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/favoritos" element={<LicitacoesShell><FavoritosPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/estrategicas" element={<LicitacoesShell><EstrategicasPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/perfil" element={<LicitacoesShell><PerfilPage /></LicitacoesShell>} />
-            <Route path="/licitacoes/perfis" element={<LicitacoesShell><PerfisPage /></LicitacoesShell>} />
+              {/* Login único */}
+              <Route path="/app/login" element={<LoginPage />} />
 
-            <Route path="/governanca" element={<LicitacoesShell><GovernancaPage /></LicitacoesShell>} />
-            <Route path="/governanca/automacoes" element={<LicitacoesShell><AutomacoesPage /></LicitacoesShell>} />
-            <Route path="/governanca/auditoria" element={<LicitacoesShell><AuditoriaPage /></LicitacoesShell>} />
+              {/* /app raiz → primeiro núcleo */}
+              <Route path="/app" element={wrap(<DashboardPage />)} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Núcleo 01 — Projetos & Squads */}
+              <Route path="/app/projetos" element={wrap(<DashboardPage />)} />
+              <Route path="/app/projetos/portfolio" element={wrap(<PortfolioPage />)} />
+              <Route path="/app/projetos/projeto/:id" element={wrap(<ProjectDetailPage />)} />
+              <Route path="/app/projetos/squads" element={wrap(<SquadsPage />)} />
+              <Route path="/app/projetos/capacidade" element={wrap(<CapacityPage />)} />
+              <Route path="/app/projetos/dependencias" element={wrap(<DependenciesPage />)} />
+              <Route path="/app/projetos/cronograma" element={wrap(<SchedulePage />)} />
+              <Route path="/app/projetos/admin" element={wrap(<AdminPage />)} />
+
+              {/* Núcleo 02 — Licitações */}
+              <Route path="/app/licitacoes" element={wrap(<RadarPage />)} />
+              <Route path="/app/licitacoes/triagem" element={wrap(<TriagemPage />)} />
+              <Route path="/app/licitacoes/atestados" element={wrap(<AtestadosPage />)} />
+              <Route path="/app/licitacoes/solucoes" element={wrap(<SolucoesPage />)} />
+              <Route path="/app/licitacoes/favoritos" element={wrap(<FavoritosPage />)} />
+              <Route path="/app/licitacoes/estrategicas" element={wrap(<EstrategicasPage />)} />
+              <Route path="/app/licitacoes/perfil" element={wrap(<PerfilPage />)} />
+              <Route path="/app/licitacoes/perfis" element={wrap(<PerfisPage />)} />
+
+              {/* Núcleo 03 — Automações & Governança */}
+              <Route path="/app/automacoes" element={wrap(<GovernancaPage />)} />
+              <Route path="/app/automacoes/catalogo" element={wrap(<AutomacoesPage />)} />
+              <Route path="/app/automacoes/auditoria" element={wrap(<AuditoriaPage />)} />
+
+              {/* Compat: rotas antigas → novas */}
+              <Route path="/projetos-squads" element={<Navigate to="/" replace />} />
+              <Route path="/projetos-squads/login" element={<Navigate to="/app/login" replace />} />
+              <Route path="/projetos-squads/app" element={<Navigate to="/app/projetos" replace />} />
+              <Route path="/projetos-squads/app/*" element={<LegacyRedirect from="/projetos-squads/app" to="/app/projetos" />} />
+
+              <Route path="/licitacoes" element={<Navigate to="/app/licitacoes" replace />} />
+              <Route path="/licitacoes/*" element={<LegacyRedirect from="/licitacoes" to="/app/licitacoes" />} />
+
+              <Route path="/governanca" element={<Navigate to="/app/automacoes" replace />} />
+              <Route path="/governanca/automacoes" element={<Navigate to="/app/automacoes/catalogo" replace />} />
+              <Route path="/governanca/auditoria" element={<Navigate to="/app/automacoes/auditoria" replace />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </DataProvider>
         </AuthProvider>
       </BrowserRouter>
