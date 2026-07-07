@@ -2,7 +2,7 @@
 
 Documentação completa do módulo de Licitações — arquitetura, rotas, fluxos de dados, regras de negócio, esquema de banco, edge functions e status de implementação.
 
-Última atualização: 03/07/2026.
+Última atualização: 07/07/2026.
 
 ---
 
@@ -17,24 +17,39 @@ Base legal coberta:
 - CATSER/CATMAT de TI (objeto livre).
 
 Backend: **Lovable Cloud** (Postgres + Edge Functions em Deno).
-Frontend: React 18 + Vite + Tailwind + shadcn (design brutalista, mesma DS do site institucional).
+Frontend: React 18 + Vite + Tailwind + shadcn — vive dentro do shell unificado (`/app`), com RBAC por módulo (ver [`RBAC.md`](./RBAC.md)).
 
 ---
 
-## 2. Rotas do módulo (`/licitacoes`)
+## 2. Rotas do módulo (`/app/licitacoes`)
 
-Definidas em `src/App.tsx` sob o shell `LicitacoesShell` (`src/modules/licitacoes/AppShell.tsx`).
+Definidas em `src/App.tsx` sob o `AppShell` unificado (`src/app/AppShell.tsx`). O antigo `LicitacoesShell` foi convertido em re-export para compatibilidade.
 
 | Rota | Página | Ícone | Descrição |
 |---|---|---|---|
-| `/licitacoes` | `RadarPage` | Radar | Busca e purificação de editais no PNCP com KPIs de descarte. |
-| `/licitacoes/triagem` | `TriagemPage` | FileSearch | Histórico das últimas 50 triagens IA. |
-| `/licitacoes/estrategicas` | `EstrategicasPage` | Crown | Pipeline de oportunidades aprovadas (gatilho REQ-10). |
-| `/licitacoes/atestados` | `AtestadosPage` | Award | CRUD do acervo técnico (CAT). |
-| `/licitacoes/solucoes` | `SolucoesPage` | Boxes | Catálogo de soluções/produtos ofertáveis. |
-| `/licitacoes/perfis` | `PerfisPage` | Users | Quadro de pessoas reais (skills, senioridade, custo/hora, disponibilidade). |
-| `/licitacoes/perfil` | `PerfilPage` | Building2 | Core Business da empresa + blacklist customizada + valor mínimo. |
-| `/licitacoes/favoritos` | `FavoritosPage` | Star | Editais marcados como favoritos. |
+| `/app/licitacoes` | `RadarPage` | Radar | Busca e purificação de editais no PNCP com KPIs comparativos, estados explícitos e **Modo Demo**. |
+| `/app/licitacoes/triagem` | `TriagemPage` | FileSearch | Histórico das últimas 50 triagens IA. |
+| `/app/licitacoes/estrategicas` | `EstrategicasPage` | Crown | Pipeline de oportunidades aprovadas (gatilho REQ-10). |
+| `/app/licitacoes/atestados` | `AtestadosPage` | Award | CRUD do acervo técnico (CAT). |
+| `/app/licitacoes/solucoes` | `SolucoesPage` | Boxes | Catálogo de soluções/produtos ofertáveis. |
+| `/app/licitacoes/perfis` | `PerfisPage` | Users | Quadro de pessoas reais (skills, senioridade, custo/hora, disponibilidade). |
+| `/app/licitacoes/perfil` | `PerfilPage` | Building2 | Core Business da empresa + blacklist customizada + valor mínimo. |
+| `/app/licitacoes/favoritos` | `FavoritosPage` | Star | Editais marcados como favoritos. |
+
+### 2.1 Estados da RadarPage (redesign)
+
+Máquina de estados explícita (sem fetch automático no mount):
+
+| Estado | Visual |
+|---|---|
+| `idle` | Card central com CTA "Buscar últimos 7 dias, todo o Brasil" + atalho **Modo Demo**. |
+| `loading` | Skeletons nas KPIs e na lista. |
+| `vazio (PNCP retornou zero)` | Sugestão de alargar filtros. |
+| `vazio (tudo descartado)` | Botão "Ver descartados". |
+| `erro` | Banner persistente com retry + fallback para Modo Demo. |
+| `dados` | Cards densos + `Sheet` lateral de detalhe (`execution_match`, alocação sugerida, motivos_descarte). |
+
+KPIs: `Candidatos = X de Y coletados` · `Pipeline` soma apenas candidatos. Auto-refresh só ativa após primeiro fetch manual bem-sucedido. Modo Demo usa dataset em `src/modules/licitacoes/demoData.ts` (2 BID, 3 PARCIAL, restante NO-BID/descartado) preservando badges de aderência e o fluxo Triar com IA → Aprovar como Estratégico.
 
 ---
 
